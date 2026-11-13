@@ -82,7 +82,7 @@ function spawnMob(){let r=Math.floor(Math.random()*ROWS),round=state.round,hp=10
  hp*=1.5**Math.floor(round/25)*2**Math.floor(round/50);atk*=1.5**Math.floor(round/25)*2**Math.floor(round/50);
  state.mobs.push({r,x:135,y:BOARD.y+r*BOARD.ch+BOARD.ch/2,hp,maxHp:hp,atk,speed:34+Math.min(round,20),attackCd:0,flash:0});}
 function roundCount(n){return n===1?10:n===2?15:n===3?20:20+n;}
-function startRound(){state.spawnLeft+=roundCount(state.round);state.spawnClock=0;state.spawned=0;log(state.round+'라운드 시작 · 적 '+roundCount(state.round)+'마리 추가');}
+function startRound(){state.spawnLeft+=roundCount(state.round);state.spawned=0;log(state.round+'라운드 시작 · 적 '+roundCount(state.round)+'마리 추가');}
 startRound();
 function damageMob(m,d,u){if(!state.mobs.includes(m))return;d=damageValue(m,d);m.hp-=d;m.flash=.13;state.effects.push({x:m.x,y:m.y,text:'-'+Math.round(d),life:.5,color:'#d43b43'});beep(180,.04,'square');if(m.hp<=0){state.mobs=state.mobs.filter(x=>x!==m);state.coin+=5;if(u)addExp(u,10);log('적 처치! +5 코인');state.effects.push({x:m.x,y:m.y,text:'처치!',life:.7,color:'#d18b24'});}}
 function heal(u,amount,source){if(!u||u.hp<=0)return 0;let actual=Math.min(maxHp(u)-u.hp,amount);if(actual<=0)return 0;u.hp+=actual;let p=pos(u.r,u.c);state.effects.push({x:p.x,y:p.y-30,text:'+'+Math.round(actual),life:.7,color:'#1b9b65'});if(source&&source.type==='m'){source.healRemainder+=actual;while(source.healRemainder>=100){source.healRemainder-=100;addExp(source,20);log('미사 패시브: 회복 100당 EXP +20');}}return actual;}
@@ -110,7 +110,7 @@ function useSkills(dt){
    if(u.exp>=200&&u.skill2<=0){shoot(u,'캣닢공',5,1,0,'#4ad36d',false,50);u.skill2=15;}
    if(u.exp>=300&&u.skill3<=0){state.dashes.push({owner:u.id,life:.75,max:.75});for(const m of [...state.mobs])if(m.r===u.r)applyStatus(m,'vulnerable',5);vfx('jet',p.x,p.y,'#ff9b52',.8);label('냐아아아아아오오오옹! · 취약',p.x-80,p.y-55,'#e777c4');sfx('jet');u.skill3=20;}
   }else if(u.type==='f'){
-   if(u.cd<=0){shoot(u,'마법구',5,2,150*dmg,'#a45bea',true,0);u.cd=5;u.anim=.3;}
+   if(u.cd<=0){shoot(u,'마법구',5,2,50*dmg,'#a45bea',true,0);u.cd=5;u.anim=.3;}
    if(u.exp>=100&&u.skill1<=0){const target=state.mobs.filter(m=>m.r===u.r&&m.x<p.x).sort((a,b)=>b.x-a.x)[0];if(target){damageMob(target,200*dmg,u);vfx('franLaser',p.x-20,p.y,'#9c4be8',.42,{toX:target.x});label('레이저',target.x,target.y-28,'#a04ee5');sfx('laser');}u.skill1=10;}
    if(u.exp>=200&&u.skill2<=0){castMeteor(u);u.skill2=25;u.anim=.5;}
    if(u.exp>=300&&u.skill3<=0){for(let n=0;n<3;n++)state.meteors.push({cast:true,owner:u.id,delay:n*.28,damage:350*dmg});vfx('armageddon',p.x,p.y,'#a04be8',1);label('아마겟돈',p.x,p.y-55,'#8736d0');sfx('armageddon');u.skill3=40;}
