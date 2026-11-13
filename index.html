@@ -97,7 +97,7 @@ function useSkills(dt){
    if(u.exp>=100&&u.skill1<=0){const list=state.mobs.filter(m=>Math.abs(m.r-u.r)===1&&m.x<p.x&&m.x>p.x-BOARD.cw-25);if(list.length){const t=list[Math.floor(Math.random()*list.length)];t.x=Math.min(p.x-25,t.x+BOARD.cw*.7);damageMob(t,50*dmg,u);vfx('chain',t.x,t.y,'#69bfff',.55,{toX:p.x,toY:p.y});label('영혼 사슬',t.x,t.y-20,'#4b9dff');sfx('chain');}u.skill1=8;}
    if(u.exp>=200&&u.skill2<=0){state.wolves.push({r:u.r,x:965,y:p.y,owner:u.id,hit:[]});vfx('summon',965,p.y,'#4c9eff',.6);label('영혼 늑대 출격',965,p.y-25,'#367de0');sfx('wolf');u.skill2=15;}
   }else if(u.type==='a'){
-   if(u.cd<=0){shoot(u,'화살 발사',3,2,50*dmg,'#f7fbff',false,0);u.cd=u.exp>=300?1.5:3;}
+   if(u.cd<=0){shoot(u,'화살 발사',3,2,50*dmg,'#9a6337',false,0);u.cd=u.exp>=300?1.5:3;}
    if(u.exp>=100&&u.skill1<=0){shoot(u,'독 화살',2,2,30*dmg,'#42df78',true,0);u.skill1=u.exp>=300?3:6;}
    if(u.exp>=200&&u.skill2<=0){const ally=state.units.find(v=>v!==u&&v.hp>0&&v.r===u.r&&v.c===u.c-1);if(ally){const q=pos(ally.r,ally.c);state.potions.push({x:p.x-20,y:p.y-8,target:ally.id,tx:q.x,ty:q.y-10,owner:u.id,life:.48});vfx('potionCast',p.x-20,p.y,'#ff6475',.3);sfx('potion');}else label('회복 대상 없음',p.x-35,p.y-35,'#d45d70');u.skill2=15;}
   }else if(u.type==='c'){
@@ -110,7 +110,7 @@ function useSkills(dt){
    if(u.exp>=200&&u.skill2<=0){shoot(u,'캣닢공',5,1,0,'#4ad36d',false,50);u.skill2=15;}
    if(u.exp>=300&&u.skill3<=0){state.dashes.push({owner:u.id,life:.75,max:.75});for(const m of [...state.mobs])if(m.r===u.r)applyStatus(m,'vulnerable',5);vfx('jet',p.x,p.y,'#ff9b52',.8);label('냐아아아아아오오오옹! · 취약',p.x-80,p.y-55,'#e777c4');sfx('jet');u.skill3=20;}
   }else if(u.type==='f'){
-   if(u.cd<=0){shoot(u,'마법구',5,2,150*dmg,'#a45bea',true,0);u.cd=5;u.anim=.3;sfx('magic');}
+   if(u.cd<=0){shoot(u,'마법구',5,2,150*dmg,'#a45bea',true,0);u.cd=5;u.anim=.3;}
    if(u.exp>=100&&u.skill1<=0){const target=state.mobs.filter(m=>m.r===u.r&&m.x<p.x).sort((a,b)=>b.x-a.x)[0];if(target){damageMob(target,200*dmg,u);vfx('franLaser',p.x-20,p.y,'#9c4be8',.42,{toX:target.x});label('레이저',target.x,target.y-28,'#a04ee5');sfx('laser');}u.skill1=10;}
    if(u.exp>=200&&u.skill2<=0){castMeteor(u);u.skill2=25;u.anim=.5;}
    if(u.exp>=300&&u.skill3<=0){for(let n=0;n<3;n++)state.meteors.push({cast:true,owner:u.id,delay:n*.28,damage:350*dmg});vfx('armageddon',p.x,p.y,'#a04be8',1);label('아마겟돈',p.x,p.y-55,'#8736d0');sfx('armageddon');u.skill3=40;}
