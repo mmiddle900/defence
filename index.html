@@ -62,7 +62,7 @@ state=fresh();
 const $=id=>document.getElementById(id);
 function log(s){state.log.unshift(s);state.log=state.log.slice(0,35);$('log').innerHTML=state.log.map(x=>'<div>• '+x+'</div>').join('');}
 function beep(freq=440,dur=.08,type='sine'){if(!state.sound)return;try{const ac=beep.ac||(beep.ac=new(window.AudioContext||window.webkitAudioContext)());if(ac.state==='suspended')ac.resume();const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(freq,ac.currentTime);g.gain.setValueAtTime(.045,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+dur);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+dur);}catch(e){}}
-function sfx(k){const p={sword:[[210,.07,'sawtooth'],[520,.08,'triangle']],chain:[[120,.13,'sawtooth'],[260,.12,'sine']],wolf:[[95,.18,'sawtooth'],[190,.2,'triangle']],arrow:[[780,.05,'triangle']],poison:[[360,.09,'sawtooth'],[620,.1,'sine']],potion:[[540,.1,'sine'],[820,.12,'triangle']],clive:[[170,.12,'sawtooth'],[430,.1,'triangle']],flame:[[90,.22,'sawtooth'],[160,.18,'square']],cat:[[720,.06,'triangle'],[980,.06,'sine']],claw:[[1100,.06,'sawtooth'],[700,.1,'triangle']],jet:[[130,.25,'sawtooth'],[260,.2,'square']]};(p[k]||[[440,.08,'sine']]).forEach(([f,d,t],i)=>setTimeout(()=>beep(f,d,t),i*65));}
+function sfx(k){const p={sword:[[210,.07,'sawtooth'],[520,.08,'triangle']],chain:[[120,.13,'sawtooth'],[260,.12,'sine']],wolf:[[95,.18,'sawtooth'],[190,.2,'triangle']],arrow:[[780,.05,'triangle']],poison:[[360,.09,'sawtooth'],[620,.1,'sine']],potion:[[540,.1,'sine'],[820,.12,'triangle']],clive:[[170,.12,'sawtooth'],[430,.1,'triangle']],flame:[[90,.22,'sawtooth'],[160,.18,'square']],cat:[[720,.06,'triangle'],[980,.06,'sine']],catnip:[[420,.1,'sine'],[680,.14,'triangle']],claw:[[1100,.06,'sawtooth'],[700,.1,'triangle']],jet:[[130,.25,'sawtooth'],[260,.2,'square']]};(p[k]||[[440,.08,'sine']]).forEach(([f,d,t],i)=>setTimeout(()=>beep(f,d,t),i*65));}
 function vfx(type,x,y,color,life=.5,extra={}){state.vfx.push({type,x,y,color,life,max:life,...extra});}
 function label(text,x,y,color){state.effects.push({x,y,text,life:.7,color});}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
@@ -82,7 +82,7 @@ function startRound(){state.spawnLeft+=roundCount(state.round);state.spawnClock=
 startRound();
 function damageMob(m,d,u){if(!state.mobs.includes(m))return;m.hp-=d;m.flash=.13;state.effects.push({x:m.x,y:m.y,text:'-'+Math.round(d),life:.5,color:'#d43b43'});beep(180,.04,'square');if(m.hp<=0){state.mobs=state.mobs.filter(x=>x!==m);state.coin+=5;if(u)addExp(u,10);log('적 처치! +5 코인');state.effects.push({x:m.x,y:m.y,text:'처치!',life:.7,color:'#d18b24'});}}
 function heal(u,amount,source){if(!u||u.hp<=0)return 0;let actual=Math.min(maxHp(u)-u.hp,amount);if(actual<=0)return 0;u.hp+=actual;let p=pos(u.r,u.c);state.effects.push({x:p.x,y:p.y-30,text:'+'+Math.round(actual),life:.7,color:'#1b9b65'});if(source&&source.type==='m'){source.healRemainder+=actual;while(source.healRemainder>=100){source.healRemainder-=100;addExp(source,5);log('미사 패시브: 회복 100당 EXP +5');}}return actual;}
-function shoot(u,kind,range,speed,damage,color,pierce=false,healAlly=0){let p=pos(u.r,u.c);state.shots.push({owner:u.id,r:u.r,x:p.x-25,y:p.y,kind,range,speed,damage,color,pierce,hit:[],healAlly,life:range/speed,travel:0});state.effects.push({x:p.x,y:p.y-28,text:kind,life:.55,color});sfx(kind==='화살 발사'?'arrow':kind==='독 화살'?'poison':kind==='냥냥이탄'?'cat':'potion');}
+function shoot(u,kind,range,speed,damage,color,pierce=false,healAlly=0){let p=pos(u.r,u.c);state.shots.push({owner:u.id,r:u.r,x:p.x-25,y:p.y,kind,range,speed,damage,color,pierce,hit:[],healAlly,life:range/speed,travel:0});state.effects.push({x:p.x,y:p.y-28,text:kind,life:.55,color});sfx(kind==='화살 발사'?'arrow':kind==='독 화살'?'poison':kind==='냥냥이탄'?'cat':kind==='캣닢공'?'catnip':'potion');}
 function useSkills(dt){
  for(const u of state.units){
   if(u.hp<=0)continue;u.cd-=dt;u.skill1-=dt;u.skill2-=dt;u.skill3-=dt;u.anim=Math.max(0,(u.anim||0)-dt);
@@ -101,7 +101,7 @@ function useSkills(dt){
    if(u.exp>=100&&u.skill1<=0){u.fireTime=3;u.fireTick=0;u.skill1=10;vfx('fireStart',p.x-170,p.y,'#ff944d',.8);label('영혼 불꽃',p.x-100,p.y-48,'#ff9a57');sfx('flame');}
    if(u.fireTime>0){u.fireTime=Math.max(0,u.fireTime-dt);u.fireTick-=dt;if(u.fireTick<=0){for(const m of [...state.mobs])if(m.r===u.r)damageMob(m,10*dmg,u);u.fireTick=1;vfx('fireLine',BOARD.x+5,p.y,'#ff853d',.42,{row:u.r});}}
   }else if(u.type==='m'){
-   if(u.cd<=0){shoot(u,'냥냥이탄',2,2,15*dmg,'#f47acb',true,5);u.cd=2;}
+   if(u.cd<=0){shoot(u,'냥냥이탄',2,2,15*dmg,'#f47acb',true,20);u.cd=2;}
    if(u.exp>=100&&u.skill1<=0){const t=state.mobs.find(m=>m.r===u.r&&Math.abs(m.x-(p.x-BOARD.cw*3))<BOARD.cw*.52);if(t){damageMob(t,100*dmg,u);vfx('claw',t.x,t.y,'#fff',.4);label('살인병기 발톱',t.x,t.y-22,'#fff');sfx('claw');}u.skill1=8;}
    if(u.exp>=200&&u.skill2<=0){shoot(u,'캣닢공',5,1,0,'#4ad36d',false,50);u.skill2=15;}
    if(u.exp>=300&&u.skill3<=0){state.dashes.push({owner:u.id,life:.75,max:.75});for(const m of [...state.mobs])damageMob(m,10*dmg,u);vfx('jet',p.x,p.y,'#ff9b52',.8);label('냐아아아아아오오오옹!',p.x-80,p.y-55,'#e777c4');sfx('jet');u.skill3=20;}
