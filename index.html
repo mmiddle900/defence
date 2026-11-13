@@ -5,129 +5,156 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>느금마 디펜스 - 엄마를 지켜라!</title>
 <style>
-:root{color-scheme:dark;--bg:#0c1220;--panel:#172238;--panel2:#1d2b43;--line:#354965;--muted:#a9bad1;--gold:#ffd166;--cyan:#70d6ff;--red:#ff7373}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1b2b46 0,#0c1220 65%);color:#f4f7fc;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:1360px;margin:auto;padding:18px}.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-h1{font-size:clamp(25px,4vw,36px);margin:0;font-weight:900;letter-spacing:-1px}.sub{margin:4px 0 0;color:var(--muted)}
-.stats{display:flex;gap:8px;flex-wrap:wrap}.stat{background:linear-gradient(145deg,#1d2b43,#141e31);border:1px solid var(--line);border-radius:12px;padding:9px 14px;min-width:90px;font-size:12px;color:var(--muted)}.stat b{display:block;color:var(--gold);font-size:21px;margin-top:2px}
-.controls{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}.controls button,.unitpanel button{border:1px solid #536d91;background:linear-gradient(180deg,#334967,#243650);color:white;padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer;transition:.15s}.controls button:hover,.unitpanel button:hover{filter:brightness(1.18);transform:translateY(-1px)}button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
-#summon{background:linear-gradient(180deg,#986d2c,#69491e);border-color:#d9a84b}#upgrade{background:linear-gradient(180deg,#376e87,#244d68);border-color:#5bb9d8}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}.arena,.unitpanel,.log{background:linear-gradient(145deg,#18263c,#111b2d);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 30px #0003}
-.arena{padding:14px;overflow:hidden}.arenahead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}.arenahead h2{font-size:16px;margin:0}.legend{font-size:11px;color:var(--muted)}
-.board{display:flex;flex-direction:column;gap:9px}.lane{height:140px;position:relative;border:1px solid #3c506d;border-radius:12px;overflow:hidden;background:repeating-linear-gradient(90deg,#24354e 0,#24354e calc(20% - 1px),#3c506d calc(20% - 1px),#3c506d 20%);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));}
-.lane:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#20344c88,#20344c00 65%);pointer-events:none}
-.cell{position:relative;z-index:1;border-right:1px dashed #61738c66;display:flex;align-items:center;justify-content:center;padding:5px;min-width:0;cursor:pointer}.cell:last-child{border:0}.cell:hover{background:#ffffff0b}.cell.empty:after{content:"＋ 빈 슬롯";font-size:11px;color:#8295af;border:1px dashed #7388a366;border-radius:8px;padding:8px 4px}.cell.selected{background:#ffd16618;box-shadow:inset 0 0 0 2px var(--gold)}
-.unitcard{width:100%;max-width:140px;min-height:88px;padding:7px 6px;border-radius:10px;background:#111b2ceF;border:1px solid #7891b4;box-shadow:0 4px 12px #0007;text-align:center;position:relative}.unitemoji{font-size:23px;line-height:1.15}.unitname{font-weight:900;font-size:12px;margin-top:3px;white-space:nowrap}.unitmeta{font-size:10px;color:#c4d2e5;margin-top:4px}.hpbar{height:5px;background:#522d3c;border-radius:8px;margin:5px 0 2px;overflow:hidden}.hpbar i{height:100%;display:block;background:linear-gradient(90deg,#55d58a,#a3f0a9)}.unitcard small{color:#9fb3ce;font-size:9px}
-.enemy{position:absolute;z-index:3;top:8px;transform:translateX(-50%);width:42px;text-align:center;pointer-events:none;transition:left .08s linear}.enemy .mob{display:block;font-size:23px;filter:drop-shadow(0 3px 4px #000)}.enemy b{font-size:9px;color:#ffb1b1;display:block;text-shadow:0 1px 3px #000}.enemy .ehp{height:4px;background:#4d2832;border-radius:5px;overflow:hidden}.enemy .ehp i{display:block;height:100%;background:#ff7777}
-.lane-label{position:absolute;bottom:4px;left:7px;z-index:2;font-size:9px;color:#8da2be;pointer-events:none}
-.effects{position:absolute;inset:0;z-index:4;pointer-events:none}.float{position:absolute;color:#ffe18a;font-weight:900;font-size:12px;text-shadow:0 2px 4px #000;animation:rise .55s ease-out forwards}@keyframes rise{to{transform:translateY(-22px);opacity:0}}
-.aside{display:flex;flex-direction:column;gap:12px}.unitpanel{padding:14px}.unitpanel h2{font-size:16px;margin:0 0 9px}.unitpanel p{font-size:12px;color:#c2cee0;line-height:1.55;margin:7px 0}.unitpanel .muted{color:var(--muted)}.unitpanel button{width:100%;margin-top:7px}.log{height:225px;padding:12px;overflow:auto;font-size:11px;color:#c6d3e5}.log h2{font-size:14px;margin:0 0 7px}.log div{padding:5px 0;border-bottom:1px solid #2b3b54}.note{font-size:11px;line-height:1.5;color:#9eafc7;margin:12px 2px 0}.statusline{color:#ffe19a!important;font-weight:700}
-@media(max-width:900px){.layout{grid-template-columns:1fr}.aside{display:grid;grid-template-columns:1fr 1fr}.log{grid-column:1/-1}}
-@media(max-width:560px){main{padding:9px}.stats{width:100%;display:grid;grid-template-columns:repeat(4,1fr)}.stat{min-width:0;padding:7px;font-size:10px}.stat b{font-size:17px}.arena{padding:7px}.lane{height:112px}.unitcard{padding:4px 2px;min-height:78px}.unitemoji{font-size:18px}.unitname{font-size:9px}.unitmeta{font-size:8px}.enemy{width:30px}.enemy .mob{font-size:18px}.aside{grid-template-columns:1fr}.log{grid-column:auto}}
+*{box-sizing:border-box}body{margin:0;background:#101827;color:#eef4ff;font-family:system-ui,"Malgun Gothic",sans-serif}
+#app{max-width:1180px;margin:auto;padding:14px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+h1{font-size:clamp(22px,4vw,34px);margin:0}header p{margin:2px 0;color:#b9c8df}
+.stats{display:flex;gap:8px;flex-wrap:wrap}.stat{background:#202e43;border:1px solid #3b506d;border-radius:10px;padding:8px 12px;font-weight:700}
+#game{width:100%;height:auto;display:block;background:#edf3fb;border-radius:14px;border:3px solid #435b7b;touch-action:manipulation}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+button{border:0;border-radius:10px;padding:10px 14px;font-weight:800;background:#315d91;color:white;cursor:pointer}
+button:hover{filter:brightness(1.12)}button:disabled{opacity:.45;cursor:not-allowed}
+button.gold{background:#a76d13}button.red{background:#9e3e4a}button.green{background:#287a59}
+.panel{display:grid;grid-template-columns:1.2fr 1fr;gap:10px}
+.box{background:#202e43;border:1px solid #3b506d;border-radius:12px;padding:12px;min-height:100px}
+.box h3{margin:0 0 8px;font-size:16px}.box p{margin:5px 0;color:#c8d5e8;font-size:14px}
+#log{height:115px;overflow:auto;font-size:13px;color:#cbd9ed;line-height:1.5}
+#selected{font-size:14px;line-height:1.55;color:#d6e2f3}
+.note{font-size:12px;color:#aabbd2;margin:10px 2px}
+@media(max-width:700px){.panel{grid-template-columns:1fr}#app{padding:8px}.stat{padding:6px 9px;font-size:13px}button{padding:9px 11px}}
 </style>
 </head>
 <body>
-<main>
- <header class="top">
-  <div><h1>느금마 디펜스</h1><p class="sub">엄마를 지켜라! · 실시간 타워 디펜스</p></div>
-  <div class="stats">
-   <div class="stat">엄마 HP<b id="mom">10 / 10</b></div><div class="stat">코인<b id="coins">150</b></div><div class="stat">라운드<b id="round">1</b></div><div class="stat">남은 적<b id="left">10</b></div>
-  </div>
- </header>
- <nav class="controls">
-  <button id="summon">🎲 랜덤 소환 (10)</button><button id="upgrade" disabled>⬆ 선택 캐릭터 EXP +100 (200)</button><button id="pause">Ⅱ 일시정지</button><button id="reset">↻ 다시 시작</button>
- </nav>
- <div class="layout">
-  <section class="arena">
-   <div class="arenahead"><h2>⚔ 전장 · 3행 × 5열</h2><div class="legend">🧟 적 이동 방향 →　　캐릭터 공격 방향 ←</div></div>
-   <div class="board" id="board"></div>
-   <p class="note">적은 왼쪽에서 오른쪽으로 이동합니다. 캐릭터는 자신의 행에서 왼쪽을 향해 공격합니다. 빈 슬롯을 선택한 뒤 소환하면 원하는 칸에 배치할 수 있습니다. 캐릭터마다 이동은 한 번만 가능합니다.</p>
-  </section>
-  <aside class="aside">
-   <section class="unitpanel"><h2 id="detailTitle">캐릭터 정보</h2><div id="detail"><p class="muted">캐릭터를 선택하면 능력과 성장 정보가 표시됩니다.</p></div><button id="move" disabled>↔ 이동할 빈 칸 선택</button></section>
-   <section class="unitpanel"><h2>📊 전투 현황</h2><p id="status" class="statusline">전투 준비 완료</p><p>라운드는 5초마다 자동 진행됩니다.</p><p>적 처치: +5 코인 / 처치 캐릭터 EXP +10</p><p class="muted">소환 비용은 10부터 10씩 증가합니다. EXP 강화 비용은 200부터 100씩 증가합니다.</p></section>
-   <section class="log"><h2>📜 전투 기록</h2><div id="logs"></div></section>
-  </aside>
- </div>
-</main>
+<div id="app">
+<header><div><h1>느금마 디펜스</h1><p>엄마를 지켜라!</p></div><div class="stats">
+<div class="stat">엄마 HP: <span id="mom">10</span>/10</div><div class="stat">코인: <span id="coin">150</span></div><div class="stat">라운드: <span id="round">1</span></div><div class="stat">다음 라운드: <span id="timer">5.0</span>s</div>
+</div></header>
+<canvas id="game" width="1120" height="650"></canvas>
+<div class="controls">
+<button id="summon" class="green">캐릭터 소환 (10 코인)</button>
+<button id="upgrade" class="gold" disabled>경험치 업그레이드 (200 코인)</button>
+<button id="pause">일시정지</button><button id="reset" class="red">다시 시작</button>
+<button id="sound">소리 끄기</button>
+</div>
+<div class="panel">
+<section class="box"><h3>선택한 캐릭터</h3><div id="selected">캐릭터를 클릭해 선택하세요. 빈 칸을 클릭하면 선택한 캐릭터를 이동시킬 수 있습니다. 캐릭터당 이동은 1회입니다.</div></section>
+<section class="box"><h3>전투 기록</h3><div id="log"></div></section>
+</div>
+<p class="note">조작: 소환 후 빈 슬롯을 클릭해 배치 · 캐릭터 클릭 후 빈 슬롯을 클릭해 1회 이동 · 적은 왼쪽에서 오른쪽으로 이동합니다. 캐릭터는 배치된 행에서 왼쪽을 향해 공격합니다. 보스 출현 주기는 별도 지정이 없어 아직 자동 출현시키지 않습니다.</p>
+</div>
 <script>
 (()=>{
-const $=id=>document.getElementById(id),board=$('board');
-const defs={
- '제너럴 K':{hp:1000,atk:100,cd:2,emoji:'⚔️',color:'#75baff',skills:['영혼 베기','영혼 사슬 · 100 EXP','영혼 늑대 출격 · 200 EXP','절멸자 모드 · 300 EXP']},
- '클라이벳':{hp:250,atk:100,cd:2,emoji:'🗡️',color:'#d1b0ff',skills:['정복자의 검','영혼을 담은 힘 · 50 EXP','영혼 불꽃 · 100 EXP']},
- '미사':{hp:300,atk:15,cd:2,emoji:'🐱',color:'#ff9bd2',skills:['냥냥이탄','살인병기 발톱 · 100 EXP','캣닢공 · 200 EXP','냐아아아아아오오오옹! · 300 EXP']}
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+const W=1120,H=650,ROWS=3,COLS=5;
+const BOARD={x:185,y:145,cw:150,ch:145,gap:10};
+const SLOT_W=BOARD.cw-BOARD.gap*2,SLOT_H=BOARD.ch-BOARD.gap*2;
+const names={k:'제너럴 K',c:'클라이벳',m:'미사'};
+const specs={
+ k:{hp:1000,color:'#2878d0',symbol:'⚔',desc:'푸른 영혼 검을 사용하는 전사'},
+ c:{hp:250,color:'#8559c7',symbol:'🗡',desc:'영혼을 흡수하는 검객'},
+ m:{hp:300,color:'#dc78bd',symbol:'🐱',desc:'아군을 회복시키는 고양이 전사'}
 };
-let units=[],enemies=[],projectiles=[],coins=150,round=1,mom=10,spawned=0,spawnClock=0,roundClock=0,paused=false,selected=null,moveMode=false,pendingUnit=null,summonCost=10,upgradeCost=200,uid=1,last=performance.now(),gameOver=false,healingTotal={};
-const deck=['제너럴 K','제너럴 K','클라이벳','클라이벳','미사'];
-const cell=(r,c)=>r*5+c, rowOf=u=>Math.floor(u.slot/5),colOf=u=>u.slot%5;
-function say(s){let d=document.createElement('div');d.textContent=s;$('logs').prepend(d);while($('logs').children.length>45)$('logs').lastChild.remove()}
-function scale(u,n){return n*Math.pow(1.1,u.level)}
-function addUnit(name,slot){if(units.some(u=>u.slot===slot))return;let d=defs[name];let u={id:uid++,name,slot,hp:d.hp,maxHp:d.hp,exp:0,level:0,lastAtk:-99,lastChain:-99,lastWolf:-99,lastFire:-99,lastClaw:-99,lastCatnip:-99,lastUlt:-99,usedMove:false,healExp:0};units.push(u);pendingUnit=null;selected=u.id;say(name+' 배치 완료');render();showUnit()}
-function selectCell(i){let u=units.find(x=>x.slot===i);if(moveMode){let mover=units.find(x=>x.id===selected);if(mover&&!u&&!mover.usedMove){mover.slot=i;mover.usedMove=true;moveMode=false;$('status').textContent='이동 완료';say(mover.name+' 이동 완료');render();showUnit()}return}
- if(pendingUnit){if(!u){addUnit(pendingUnit,i)}else{$('status').textContent='빈 슬롯을 선택해 배치하세요.'}return}
- if(u){selected=u.id;showUnit();render()}else if(selected!==null){selected=null;showUnit();render()}}
-function render(){
- board.innerHTML='';
- for(let r=0;r<3;r++){let lane=document.createElement('div');lane.className='lane';
-  for(let c=0;c<5;c++){let i=cell(r,c),u=units.find(x=>x.slot===i),s=document.createElement('div');s.className='cell'+(u?'':' empty')+(u&&selected===u.id?' selected':'');s.onclick=()=>selectCell(i);
-   if(u){let d=defs[u.name],pct=Math.max(0,u.hp/u.maxHp*100);s.innerHTML='<div class="unitcard"><div class="unitemoji">'+d.emoji+'</div><div class="unitname" style="color:'+d.color+'">'+u.name+'</div><div class="hpbar"><i style="width:'+pct+'%"></i></div><div class="unitmeta">HP '+Math.ceil(u.hp)+'/'+Math.ceil(u.maxHp)+'<br>EXP '+u.exp+' · Lv.'+u.level+'</div>'+(u.usedMove?'<small>이동 완료</small>':'')+'</div>'}
-   lane.appendChild(s)
+let state;
+function fresh(){return {mom:10,coin:150,round:1,roundClock:0,spawnClock:0,spawnLeft:0,spawned:0,summonCost:10,upgradeCost:200,units:[],mobs:[],shots:[],effects:[],wolves:[],selected:null,placing:false,pendingType:null,paused:false,over:false,sound:true,last:0,elapsed:0,log:[]};}
+state=fresh();
+const $=id=>document.getElementById(id);
+function log(s){state.log.unshift(s);state.log=state.log.slice(0,35);$('log').innerHTML=state.log.map(x=>'<div>• '+x+'</div>').join('');}
+function beep(freq=440,dur=.08,type='sine'){if(!state.sound)return;try{const ac=beep.ac||(beep.ac=new(window.AudioContext||window.webkitAudioContext)());const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.045,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+dur);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+dur);}catch(e){}}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function pos(r,c){return{x:BOARD.x+c*BOARD.cw+BOARD.cw/2,y:BOARD.y+r*BOARD.ch+BOARD.ch/2};}
+function slotRect(r,c){return{x:BOARD.x+c*BOARD.cw+BOARD.gap,y:BOARD.y+r*BOARD.ch+BOARD.gap,w:SLOT_W,h:SLOT_H};}
+function unitAt(r,c){return state.units.find(u=>u.r===r&&u.c===c&&u.hp>0);}
+function mult(u){return 1+Math.floor(u.exp/100)*.1;}
+function maxHp(u){return u.baseHp*mult(u);}
+function addExp(u,n){if(!u||u.hp<=0)return;let old=Math.floor(u.exp/100);u.exp+=n;let now=Math.floor(u.exp/100);if(now>old){u.hp+=u.baseHp*.1*(now-old);log(names[u.type]+' 공격력·최대 체력 10% 증가!');beep(760,.12,'triangle');}}
+function makeUnit(type,r,c){let s=specs[type];return {id:Math.random(),type,r,c,baseHp:s.hp,hp:s.hp,exp:0,moved:false,cd:0,skill1:0,skill2:0,skill3:0,healRemainder:0,fireTime:0};}
+function spawnMob(){let r=Math.floor(Math.random()*ROWS),round=state.round,hp=100,atk=10;
+ if(round===2){hp*=1.05;atk*=1.05}else if(round===3){hp*=1.05**2;atk*=1.05**2}else if(round>=4){hp*=1.05**2*1.1**(round-3);atk*=1.05**2*1.1**(round-3);}
+ hp*=1.5**Math.floor(round/25)*2**Math.floor(round/50);atk*=1.5**Math.floor(round/25)*2**Math.floor(round/50);
+ state.mobs.push({r,x:135,y:BOARD.y+r*BOARD.ch+BOARD.ch/2,hp,maxHp:hp,atk,speed:34+Math.min(round,20),attackCd:0,flash:0});}
+function roundCount(n){return n===1?10:n===2?15:n===3?20:20+n;}
+function startRound(){state.spawnLeft+=roundCount(state.round);state.spawnClock=0;state.spawned=0;log(state.round+'라운드 시작 · 적 '+roundCount(state.round)+'마리 추가');}
+startRound();
+function damageMob(m,d,u){if(!state.mobs.includes(m))return;m.hp-=d;m.flash=.13;state.effects.push({x:m.x,y:m.y,text:'-'+Math.round(d),life:.5,color:'#d43b43'});beep(180,.04,'square');if(m.hp<=0){state.mobs=state.mobs.filter(x=>x!==m);state.coin+=5;if(u)addExp(u,10);log('적 처치! +5 코인');state.effects.push({x:m.x,y:m.y,text:'처치!',life:.7,color:'#d18b24'});}}
+function heal(u,amount,source){if(!u||u.hp<=0)return 0;let actual=Math.min(maxHp(u)-u.hp,amount);if(actual<=0)return 0;u.hp+=actual;let p=pos(u.r,u.c);state.effects.push({x:p.x,y:p.y-30,text:'+'+Math.round(actual),life:.7,color:'#1b9b65'});if(source&&source.type==='m'){source.healRemainder+=actual;while(source.healRemainder>=100){source.healRemainder-=100;addExp(source,5);log('미사 패시브: 회복 100당 EXP +5');}}return actual;}
+function shoot(u,kind,range,speed,damage,color,pierce=false,healAlly=0){let p=pos(u.r,u.c);state.shots.push({owner:u.id,r:u.r,x:p.x-25,y:p.y,kind,range,speed,damage,color,pierce,hit:[],healAlly,life:range/speed,travel:0});state.effects.push({x:p.x,y:p.y-28,text:kind,life:.55,color});beep(kind==='냥냥이탄'?680:430,.07,'triangle');}
+function useSkills(dt){
+ for(const u of state.units){if(u.hp<=0)continue;u.cd-=dt;u.skill1-=dt;u.skill2-=dt;u.skill3-=dt;const p=pos(u.r,u.c),dmg=mult(u);
+  if(u.type==='k'){
+   let cd=u.exp>=300?1:2;
+   if(u.cd<=0){let target=state.mobs.filter(m=>m.r===u.r&&m.x<=p.x+10&&m.x>=p.x-BOARD.cw-15).sort((a,b)=>b.x-a.x)[0];if(target){let amount=100*dmg;damageMob(target,amount,u);if(u.exp>=300)heal(u,amount*.5,null);state.effects.push({x:p.x-75,y:p.y,text:'영혼 베기',life:.65,color:'#348be8'});beep(260,.12,'sawtooth');}u.cd=cd;}
+   if(u.exp>=100&&u.skill1<=0){let opts=state.mobs.filter(m=>Math.abs(m.r-u.r)===1&&m.x<p.x);if(opts.length){let t=opts[Math.floor(Math.random()*opts.length)];t.x=Math.max(140,t.x-BOARD.cw);damageMob(t,50*dmg,u);state.effects.push({x:t.x,y:t.y,text:'영혼 사슬',life:.8,color:'#4b9dff'});beep(150,.18,'sawtooth');}u.skill1=8;}
+   if(u.exp>=200&&u.skill2<=0){state.wolves.push({r:u.r,x:965,y:p.y,owner:u.id,hit:[]});state.effects.push({x:965,y:p.y,text:'영혼 늑대 출격',life:.8,color:'#367de0'});beep(320,.2,'sawtooth');u.skill2=15;}
+  }else if(u.type==='c'){
+   if(u.cd<=0){let target=state.mobs.filter(m=>m.r===u.r&&m.x<=p.x+10&&m.x>=p.x-BOARD.cw-15).sort((a,b)=>b.x-a.x)[0];if(target){let amount=100*dmg;damageMob(target,amount,u);heal(u,amount*.25,null);state.effects.push({x:p.x-75,y:p.y,text:'정복자의 검',life:.65,color:'#a875e8'});beep(330,.12,'sawtooth');if(u.exp>=50){for(const m of [...state.mobs])if(Math.abs(m.r-u.r)<=1&&Math.abs(m.x-p.x)<BOARD.cw*.8)damageMob(m,amount*.15,u);state.effects.push({x:p.x-35,y:p.y,text:'영혼 파동',life:.6,color:'#c39aff'});}}u.cd=2;}
+   if(u.exp>=100&&u.skill1<=0){u.fireTime=3;u.skill1=10;state.effects.push({x:p.x-100,y:p.y,text:'영혼 불꽃',life:.9,color:'#ed9dff'});beep(190,.25,'sawtooth');}
+   if(u.fireTime>0){u.fireTime-=dt;for(const m of [...state.mobs])if(m.r===u.r)damageMob(m,10*dt,u);}
+  }else if(u.type==='m'){
+   if(u.cd<=0){shoot(u,'냥냥이탄',2,2,15*dmg,'#ef7ac8',true,5);u.cd=2;}
+   if(u.exp>=100&&u.skill1<=0){let target=state.mobs.find(m=>m.r===u.r&&m.x<p.x-BOARD.cw*2.3&&m.x>p.x-BOARD.cw*3.7);if(target){damageMob(target,100*dmg,u);state.effects.push({x:target.x,y:target.y,text:'살인병기 발톱',life:.8,color:'#fff'});beep(900,.1,'sawtooth');}u.skill1=8;}
+   if(u.exp>=200&&u.skill2<=0){shoot(u,'캣닢공',5,1,0,'#35b95f',false,50);u.skill2=15;}
+   if(u.exp>=300&&u.skill3<=0){for(const m of [...state.mobs])damageMob(m,10*dmg,u);state.effects.push({x:560,y:p.y,text:'냐아아아아아오오오옹!',life:1.2,color:'#e777c4'});beep(110,.35,'sawtooth');u.skill3=20;}
   }
-  enemies.filter(e=>e.lane===r).forEach(e=>{let token=document.createElement('div');token.className='enemy';token.style.left=(Math.max(1,Math.min(99,e.x/5*100)))+'%';token.innerHTML='<span class="mob">🧟</span><div class="ehp"><i style="width:'+Math.max(0,e.hp/e.maxHp*100)+'%"></i></div><b>'+Math.ceil(e.hp)+'</b>';lane.appendChild(token)});
-  let label=document.createElement('div');label.className='lane-label';label.textContent=(r+1)+'행';lane.appendChild(label);board.appendChild(lane)
- }
- $('mom').textContent=mom+' / 10';$('coins').textContent=coins;$('round').textContent=round;
- $('left').textContent=Math.max(0,enemyCount(round)-spawned+enemies.length);
- $('summon').textContent='🎲 랜덤 소환 ('+summonCost+')';$('upgrade').textContent='⬆ 선택 캐릭터 EXP +100 ('+upgradeCost+')';
- $('upgrade').disabled=!units.some(x=>x.id===selected)||coins<upgradeCost||gameOver;
- $('summon').disabled=coins<summonCost||gameOver;
-}
-function showUnit(){let u=units.find(x=>x.id===selected);if(!u){$('detailTitle').textContent='캐릭터 정보';$('detail').innerHTML='<p class="muted">캐릭터를 선택하면 능력과 성장 정보가 표시됩니다.</p>';$('move').disabled=true;return}
- let d=defs[u.name],skills=d.skills.filter((s,i)=>i===0||(u.name==='클라이벳'&&i===1&&u.exp>=50)||(u.name==='클라이벳'&&i===2&&u.exp>=100)||(u.name!=='클라이벳'&&u.exp>=i*100));
- $('detailTitle').textContent=d.emoji+' '+u.name;$('detail').innerHTML='<p>체력: <b>'+Math.ceil(u.hp)+' / '+Math.ceil(u.maxHp)+'</b><br>공격력: <b>'+Math.round(scale(u,d.atk))+'</b><br>EXP: <b>'+u.exp+'</b> · 레벨: <b>'+u.level+'</b></p><p><b>해금 능력</b><br>'+skills.join('<br>')+'</p><p class="muted">100 EXP마다 공격력과 최대 체력이 10% 증가합니다.</p>';
- $('move').disabled=u.usedMove||gameOver;$('move').textContent=u.usedMove?'이동 완료':'↔ 이동할 빈 칸 선택';$('upgrade').disabled=coins<upgradeCost}
-function enemyCount(r){return r===1?10:r===2?15:r===3?20:20+r}
-function enemyStats(r){let mult=1;if(r===2)mult=1.05;else if(r===3)mult=1.05*1.05;else if(r>=4)mult=1.05*1.05*Math.pow(1.1,r-3);if(r%50===0)mult*=2;else if(r%25===0)mult*=1.5;return{hp:100*mult,atk:10*mult}}
-function spawn(){let s=enemyStats(round),lane=Math.floor(Math.random()*3);enemies.push({id:uid++,lane,x:0,hp:s.hp,maxHp:s.hp,atk:s.atk,speed:.24});spawned++}
-function heal(u,amount){if(!u||amount<=0)return;let actual=Math.min(amount,u.maxHp-u.hp);u.hp+=actual;if(u.name==='미사'&&actual>0){u.healExp+=actual;while(u.healExp>=100){u.healExp-=100;u.exp+=5;refreshLevel(u)}}}
-function refreshLevel(u){let lv=Math.floor(u.exp/100);while(u.level<lv){u.level++;let ratio=u.hp/u.maxHp;u.maxHp*=1.1;u.hp=u.maxHp*ratio;say(u.name+' 레벨 상승! (Lv.'+u.level+')')}}
-function hit(e,damage,u){if(!enemies.includes(e))return;e.hp-=damage;if(e.hp<=0){enemies=enemies.filter(x=>x.id!==e.id);coins+=5;if(u){u.exp+=10;refreshLevel(u)}say((u?u.name:'공격')+' 처치! +5 코인')}}
-function nearestInLane(lane,maxX,minX=0){return enemies.filter(e=>e.lane===lane&&e.x<=maxX&&e.x>=minX).sort((a,b)=>b.x-a.x)[0]}
-function attack(u,now){let d=defs[u.name],r=rowOf(u),c=colOf(u),base=scale(u,d.atk);
- if(now-u.lastAtk>=d.cd){let target=nearestInLane(r,c+.05,Math.max(0,c-1.35));if(target){u.lastAtk=now;
-  if(u.name==='미사'){projectiles.push({type:'cat',lane:r,x:c-.1,speed:2,range:2,travel:0,damage:scale(u,15),owner:u.id})}
-  else{hit(target,base,u);if(u.name==='클라이벳')heal(u,base*.25);
-   if(u.name==='클라이벳'&&u.exp>=50){for(let e of [...enemies])if(e.id!==target.id&&Math.abs(e.lane-r)<=1&&Math.abs(e.x-c)<=1.05)hit(e,base*.15,u)}
-   if(u.name==='제너럴 K'&&u.exp>=300)heal(u,base*.5)
-  }
- }}
- if(u.name==='제너럴 K'&&u.exp>=100&&now-u.lastChain>=8){let candidates=enemies.filter(e=>Math.abs(e.lane-r)===1&&e.x<c+.1&&e.x>c-2.1);if(candidates.length){let t=candidates[Math.floor(Math.random()*candidates.length)];u.lastChain=now;hit(t,scale(u,50),u);t.x=Math.max(0,t.x-.7)}}
- if(u.name==='제너럴 K'&&u.exp>=200&&now-u.lastWolf>=15){u.lastWolf=now;projectiles.push({type:'wolf',lane:r,x:5.05,speed:1,range:5.2,travel:0,damage:scale(u,50),owner:u.id})}
- if(u.name==='클라이벳'&&u.exp>=100&&now-u.lastFire>=10){u.lastFire=now;say('클라이벳: 영혼 불꽃!');u.fireUntil=now+3}
- if(u.name==='미사'&&u.exp>=100&&now-u.lastClaw>=8){let t=nearestInLane(r,c+0.05,Math.max(0,c-3.05));if(t){u.lastClaw=now;hit(t,scale(u,100),u);say('미사: 살인병기 발톱!')}}
- if(u.name==='미사'&&u.exp>=200&&now-u.lastCatnip>=15){let ally=units.find(a=>a.id!==u.id&&a.hp<a.maxHp);if(ally){u.lastCatnip=now;projectiles.push({type:'catnip',lane:r,x:c-.1,speed:1,range:5,travel:0,damage:0,owner:u.id,target:ally.id});say('미사: 캣닢공!')}}
- if(u.name==='미사'&&u.exp>=300&&now-u.lastUlt>=20){u.lastUlt=now;say('미사: 냐아아아아아오오오옹!');for(let e of [...enemies])hit(e,scale(u,10),u)}
-}
-function update(dt,now){if(paused||gameOver)return;roundClock+=dt;spawnClock+=dt;
- if(roundClock>=5){roundClock-=5;round++;spawned=0;say('라운드 '+round+' 시작')}
- if(spawned<enemyCount(round)&&spawnClock>=1){spawnClock-=1;spawn()}
- for(let e of [...enemies]){e.x+=e.speed*dt;if(e.x>=5){mom=Math.max(0,mom-1);enemies=enemies.filter(x=>x.id!==e.id);say('적이 엄마에게 도달했습니다! 엄마 HP -1');if(mom<=0){gameOver=true;paused=true;$('status').textContent='패배 — 엄마를 지키지 못했습니다.';say('게임 오버')}}}
- for(let u of units){attack(u,now);if(u.fireUntil&&now<u.fireUntil){for(let e of [...enemies])if(e.lane===rowOf(u))hit(e,10*dt,u)}}
- for(let p of [...projectiles]){p.x-=p.speed*dt;p.travel+=p.speed*dt;let e=enemies.find(e=>e.lane===p.lane&&Math.abs(e.x-p.x)<.22);
-  if(p.type==='cat'&&e){hit(e,p.damage,units.find(u=>u.id===p.owner));for(let a of units)if(rowOf(a)===p.lane&&Math.abs(colOf(a)-p.x)<.3)heal(a,5)}
-  else if(p.type==='wolf'&&e)hit(e,p.damage,units.find(u=>u.id===p.owner));
-  else if(p.type==='catnip'){let ally=units.find(u=>u.id===p.target);if(ally&&Math.abs(colOf(ally)-p.x)<.3){heal(ally,50);projectiles=projectiles.filter(x=>x!==p);continue}}
-  if((p.type==='cat'&&p.travel>=2)||(p.type==='wolf'&&p.x<-.2)||(p.type==='catnip'&&p.travel>=5)||e&&p.type!=='cat'){projectiles=projectiles.filter(x=>x!==p)}
  }
 }
-function loop(t){let dt=Math.min(.05,(t-last)/1000);last=t;update(dt,t/1000);if(Math.floor(t/180)!==Math.floor((t-dt*1000)/180))render();requestAnimationFrame(loop)}
-$('summon').onclick=()=>{if(coins<summonCost||gameOver)return;let empty=Array.from({length:15},(_,i)=>i).filter(i=>!units.some(u=>u.slot===i));if(!empty.length){$('status').textContent='빈 슬롯이 없습니다. 캐릭터를 이동하거나 자리를 비워주세요.';return}coins-=summonCost;summonCost+=10;let name=deck[Math.floor(Math.random()*deck.length)];pendingUnit=name;$('status').textContent=name+' 소환 완료! 배치할 빈 슬롯을 선택하세요.';say(name+' 소환! 배치할 칸을 선택하세요.');render()};
-$('upgrade').onclick=()=>{let u=units.find(x=>x.id===selected);if(!u||coins<upgradeCost||gameOver)return;coins-=upgradeCost;u.exp+=100;refreshLevel(u);upgradeCost+=100;showUnit();render();say(u.name+' EXP +100')};
-$('move').onclick=()=>{let u=units.find(x=>x.id===selected);if(!u||u.usedMove||gameOver)return;moveMode=true;$('status').textContent='이동할 빈 슬롯을 선택하세요.'};
-$('pause').onclick=()=>{if(gameOver)return;paused=!paused;$('pause').textContent=paused?'▶ 계속하기':'Ⅱ 일시정지';$('status').textContent=paused?'일시정지 중':'전투 진행 중'};
-$('reset').onclick=()=>{if(!confirm('게임을 처음부터 다시 시작할까요?'))return;units=[];enemies=[];projectiles=[];coins=150;round=1;mom=10;spawned=0;spawnClock=0;roundClock=0;paused=false;gameOver=false;selected=null;moveMode=false;pendingUnit=null;summonCost=10;upgradeCost=200;uid=1;$('status').textContent='전투 준비 완료';$('pause').textContent='Ⅱ 일시정지';$('logs').innerHTML='';render();showUnit()};
-render();showUnit();say('전투 준비 완료. 캐릭터를 소환해 빈 슬롯에 배치하세요.');requestAnimationFrame(loop);
+function update(dt){
+ if(state.paused||state.over)return;state.elapsed+=dt;state.roundClock+=dt;state.spawnClock+=dt;
+ if(state.roundClock>=5){state.roundClock-=5;state.round++;startRound();}
+ if(state.spawnLeft>0&&state.spawnClock>=1){state.spawnClock-=1;state.spawnLeft--;spawnMob();}
+ useSkills(dt);
+ for(const s of state.shots){s.x-=s.speed*BOARD.cw*dt;s.life-=dt;s.travel+=s.speed*dt;
+  if(s.healAlly){let ally=state.units.find(u=>u.id!==s.owner&&u.hp>0&&u.r===s.r&&Math.abs(pos(u.r,u.c).x-s.x)<18&&!s.hit.includes(u.id));if(ally){heal(ally,s.healAlly,state.units.find(u=>u.id===s.owner));s.hit.push(ally.id);s.life=0;}}
+  let hit=state.mobs.find(m=>m.r===s.r&&Math.abs(m.x-s.x)<17&&!s.hit.includes(m));if(hit){damageMob(hit,s.damage,state.units.find(u=>u.id===s.owner));s.hit.push(hit);if(!s.pierce)s.life=0;}
+ }
+ state.shots=state.shots.filter(s=>s.life>0&&s.x>30);
+ for(const w of state.wolves){w.x-=BOARD.cw*dt;for(const m of [...state.mobs])if(m.r===w.r&&Math.abs(m.x-w.x)<22&&!w.hit.includes(m)){let owner=state.units.find(u=>u.id===w.owner);damageMob(m,50*(owner?mult(owner):1),owner);w.hit.push(m);}}
+ state.wolves=state.wolves.filter(w=>w.x>120);
+ for(const m of [...state.mobs]){
+  let blocker=state.units.filter(u=>u.hp>0&&u.r===m.r&&pos(u.r,u.c).x<m.x+22).sort((a,b)=>pos(b.r,b.c).x-pos(a.r,a.c).x)[0];
+  if(blocker&&m.x>=pos(blocker.r,blocker.c).x-35){m.attackCd-=dt;if(m.attackCd<=0){blocker.hp-=m.atk;m.attackCd=1;m.flash=.1;state.effects.push({x:pos(blocker.r,blocker.c).x,y:m.y-25,text:'-'+Math.round(m.atk),life:.45,color:'#d43b43'});beep(95,.05,'square');if(blocker.hp<=0){state.units=state.units.filter(u=>u!==blocker);if(state.selected===blocker.id)state.selected=null;log(names[blocker.type]+' 전투 불능');}}}
+  else m.x+=m.speed*dt;
+  if(m.x>=1030){state.mobs=state.mobs.filter(x=>x!==m);state.mom--;log('적이 엄마에게 도달! 엄마 HP -1');beep(90,.25,'square');if(state.mom<=0){state.mom=0;state.over=true;log('게임 오버! 다시 시작을 눌러 재도전하세요.');}}
+ }
+ for(const e of state.effects)e.life-=dt;state.effects=state.effects.filter(e=>e.life>0);
+}
+function rr(x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
+function draw(){
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#edf3fb';ctx.fillRect(0,0,W,H);
+ ctx.fillStyle='#dbe7f5';ctx.fillRect(15,110,125,480);ctx.fillStyle='#e8d8bd';ctx.fillRect(965,110,140,480);
+ ctx.fillStyle='#53657c';ctx.font='bold 17px sans-serif';ctx.textAlign='center';ctx.fillText('적 출현',77,90);ctx.fillText('엄마의 집',1035,90);
+ ctx.font='42px sans-serif';ctx.fillText('👾',77,350);ctx.fillText('🏠',1035,350);ctx.font='13px sans-serif';ctx.fillText('엄마 HP '+state.mom+'/10',1035,405);
+ for(let r=0;r<ROWS;r++){let y=BOARD.y+r*BOARD.ch;rr(155,y,820,BOARD.ch-4,12,r%2?'#e8f0fa':'#e2edf8');ctx.fillStyle='#8b9db5';ctx.font='bold 13px sans-serif';ctx.textAlign='left';ctx.fillText('라인 '+(r+1),160,y+18);}
+ ctx.textAlign='center';ctx.font='bold 13px sans-serif';for(let c=0;c<COLS;c++)ctx.fillText((c+1)+'열',BOARD.x+c*BOARD.cw+BOARD.cw/2,125);
+ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const rect=slotRect(r,c),p=pos(r,c),u=unitAt(r,c),sel=u&&state.selected===u.id;rr(rect.x,rect.y,rect.w,rect.h,12,u?'#fff':'#f8fbff');ctx.strokeStyle=sel?'#e3a51b':u?specs[u.type].color:state.placing?'#42a878':'#bdcadb';ctx.lineWidth=sel?5:2;ctx.strokeRect(rect.x+1,rect.y+1,rect.w-2,rect.h-2);ctx.fillStyle='#a3b2c5';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText(String(r*COLS+c+1),rect.x+9,rect.y+15);
+  if(u){ctx.beginPath();ctx.arc(p.x,p.y-12,25,0,Math.PI*2);ctx.fillStyle=specs[u.type].color;ctx.fill();ctx.fillStyle='white';ctx.font='25px sans-serif';ctx.textAlign='center';ctx.fillText(specs[u.type].symbol,p.x,p.y-4);ctx.fillStyle='#263b55';ctx.font='bold 13px sans-serif';ctx.fillText(names[u.type],p.x,p.y+24);rr(p.x-42,p.y+32,84,7,4,'#dce4ee');rr(p.x-42,p.y+32,84*clamp(u.hp/maxHp(u),0,1),7,4,'#27a36a');ctx.fillStyle='#586a81';ctx.font='10px sans-serif';ctx.fillText('HP '+Math.ceil(u.hp)+' · EXP '+Math.floor(u.exp),p.x,p.y+54);if(u.moved){ctx.fillStyle='#bd7a19';ctx.font='10px sans-serif';ctx.fillText('이동 완료',p.x,p.y+68);}}
+  else{ctx.fillStyle='#9aaabd';ctx.textAlign='center';ctx.font='bold 25px sans-serif';ctx.fillText('+',p.x,p.y+4);ctx.font='11px sans-serif';ctx.fillText('빈 슬롯',p.x,p.y+24);}
+ }
+ for(const m of state.mobs){ctx.beginPath();ctx.arc(m.x,m.y,17,0,Math.PI*2);ctx.fillStyle=m.flash>0?'#fff':'#d85c5c';ctx.fill();ctx.fillStyle='#fff';ctx.font='17px sans-serif';ctx.textAlign='center';ctx.fillText('👾',m.x,m.y+6);rr(m.x-20,m.y-27,40,5,3,'#b8c3d1');rr(m.x-20,m.y-27,40*clamp(m.hp/m.maxHp,0,1),5,3,'#d83d47');}
+ for(const s of state.shots){ctx.beginPath();ctx.arc(s.x,s.y,s.kind==='냥냥이탄'?10:7,0,Math.PI*2);ctx.fillStyle=s.color;ctx.fill();if(s.kind==='냥냥이탄'){ctx.font='17px sans-serif';ctx.fillText('🐾',s.x,s.y+5);}}
+ for(const w of state.wolves){ctx.font='27px sans-serif';ctx.textAlign='center';ctx.fillText('🐺',w.x,w.y+8);}
+ for(const e of state.effects){ctx.globalAlpha=clamp(e.life/.7,0,1);ctx.fillStyle=e.color;ctx.font='bold 14px sans-serif';ctx.textAlign='center';ctx.fillText(e.text,e.x,e.y-20-(.7-e.life)*18);ctx.globalAlpha=1;}
+ if(state.paused&&!state.over){ctx.fillStyle='rgba(12,20,34,.48)';ctx.fillRect(0,0,W,H);ctx.fillStyle='white';ctx.font='bold 42px sans-serif';ctx.textAlign='center';ctx.fillText('PAUSED',W/2,H/2);}
+ if(state.over){ctx.fillStyle='rgba(12,20,34,.72)';ctx.fillRect(0,0,W,H);ctx.fillStyle='white';ctx.font='bold 48px sans-serif';ctx.textAlign='center';ctx.fillText('GAME OVER',W/2,H/2);ctx.font='20px sans-serif';ctx.fillText('다시 시작을 눌러 재도전하세요',W/2,H/2+42);}
+}
+function refresh(){ $('mom').textContent=state.mom;$('coin').textContent=state.coin;$('round').textContent=state.round;$('timer').textContent=(5-state.roundClock).toFixed(1);
+ $('summon').textContent='캐릭터 소환 ('+state.summonCost+' 코인)';$('summon').disabled=state.coin<state.summonCost||state.over||state.units.length>=15;
+ $('upgrade').textContent='경험치 업그레이드 ('+state.upgradeCost+' 코인)';$('upgrade').disabled=state.coin<state.upgradeCost||!state.selected||state.over;
+ $('pause').textContent=state.paused?'계속하기':'일시정지';$('sound').textContent=state.sound?'소리 끄기':'소리 켜기';
+ const u=state.units.find(v=>v.id===state.selected);
+ $('selected').innerHTML=u?'<b>'+names[u.type]+'</b><br>체력: '+Math.ceil(u.hp)+' / '+Math.ceil(maxHp(u))+'<br>경험치: '+Math.floor(u.exp)+' EXP · 공격력 배율: ×'+mult(u).toFixed(1)+'<br>이동: '+(u.moved?'사용 완료':'1회 가능')+'<br>해금: '+(u.exp>=300?'모든 스킬':u.exp>=200?'200 EXP 스킬':u.exp>=100?'100 EXP 스킬':u.type==='c'&&u.exp>=50?'50 EXP 스킬':'기본 공격'):'캐릭터를 클릭해 선택하세요. 빈 칸을 클릭하면 선택한 캐릭터를 이동시킬 수 있습니다. 캐릭터당 이동은 1회입니다.';
+}
+function frame(t){if(!state.last)state.last=t;let dt=Math.min(.05,(t-state.last)/1000);state.last=t;update(dt);draw();refresh();requestAnimationFrame(frame);}
+function point(ev){let r=canvas.getBoundingClientRect();return{x:(ev.clientX-r.left)*W/r.width,y:(ev.clientY-r.top)*H/r.height};}
+canvas.addEventListener('click',ev=>{if(state.over||state.paused)return;let p=point(ev),c=Math.floor((p.x-BOARD.x)/BOARD.cw),r=Math.floor((p.y-BOARD.y)/BOARD.ch);if(r<0||r>=ROWS||c<0||c>=COLS)return;const rect=slotRect(r,c);if(p.x<rect.x||p.x>rect.x+rect.w||p.y<rect.y||p.y>rect.y+rect.h)return;let u=unitAt(r,c);
+ if(state.placing){if(!u){state.units.push(makeUnit(state.pendingType,r,c));state.placing=false;log(names[state.pendingType]+' 배치 완료');state.pendingType=null;beep(600,.1);}return;}
+ if(u){state.selected=u.id;return;}let sel=state.units.find(v=>v.id===state.selected);if(sel&&!sel.moved){sel.r=r;sel.c=c;sel.moved=true;log(names[sel.type]+' 이동 완료');beep(390,.08);}
+});
+$('summon').onclick=()=>{if(state.coin<state.summonCost||state.over||state.units.length>=15)return;state.coin-=state.summonCost;state.summonCost+=10;let deck=['k','k','c','c','m'],type=deck[Math.floor(Math.random()*deck.length)];state.pendingType=type;state.placing=true;state.selected=null;log(names[type]+' 소환! 빈 슬롯을 선택하세요.');beep(720,.13,'triangle');};
+$('upgrade').onclick=()=>{let u=state.units.find(v=>v.id===state.selected);if(!u||state.coin<state.upgradeCost)return;state.coin-=state.upgradeCost;addExp(u,100);state.upgradeCost+=100;log(names[u.type]+' EXP +100');beep(800,.13,'triangle');};
+$('pause').onclick=()=>{if(state.over)return;state.paused=!state.paused;};
+$('sound').onclick=()=>{state.sound=!state.sound;};
+$('reset').onclick=()=>{state=fresh();$('log').innerHTML='';log('새 게임을 시작합니다.');startRound();};
+log('게임 시작! 캐릭터를 소환해 배치하세요.');requestAnimationFrame(frame);
 })();
 </script>
 </body></html>
