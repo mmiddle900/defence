@@ -33,6 +33,7 @@ button.gold{background:#a76d13}button.red{background:#9e3e4a}button.green{backgr
 <div class="controls">
 <button id="summon" class="green">캐릭터 소환 (10 코인)</button>
 <button id="upgrade" class="gold" disabled>경험치 업그레이드 (200 코인)</button>
+<button id="sell" class="red" disabled>선택 캐릭터 판매</button>
 <button id="pause">일시정지</button><button id="reset" class="red">다시 시작</button>
 <button id="sound">소리 끄기</button>
 </div>
@@ -56,7 +57,7 @@ const specs={
  m:{hp:300,color:'#dc78bd',symbol:'🐱',desc:'아군을 회복시키는 고양이 전사'}
 };
 let state;
-function fresh(){return {mom:10,coin:150,round:1,roundClock:0,spawnClock:0,spawnLeft:0,spawned:0,summonCost:10,upgradeCost:200,units:[],mobs:[],shots:[],potions:[],effects:[],vfx:[],wolves:[],dashes:[],selected:null,placing:false,pendingType:null,paused:false,over:false,sound:true,last:0,elapsed:0,log:[]};}
+function fresh(){return {mom:10,coin:150,round:1,roundClock:0,spawnClock:0,spawnLeft:0,spawned:0,summonCost:10,upgradeCost:200,units:[],mobs:[],shots:[],potions:[],effects:[],vfx:[],wolves:[],dashes:[],selected:null,placing:false,pendingType:null,pendingPurchaseCost:10,paused:false,over:false,sound:true,last:0,elapsed:0,log:[]};}
 state=fresh();
 const $=id=>document.getElementById(id);
 function log(s){state.log.unshift(s);state.log=state.log.slice(0,35);$('log').innerHTML=state.log.map(x=>'<div>• '+x+'</div>').join('');}
@@ -71,7 +72,7 @@ function unitAt(r,c){return state.units.find(u=>u.r===r&&u.c===c&&u.hp>0);}
 function mult(u){return 1+Math.floor(u.exp/100)*.1;}
 function maxHp(u){return u.baseHp*mult(u);}
 function addExp(u,n){if(!u||u.hp<=0)return;let old=Math.floor(u.exp/100);u.exp+=n;let now=Math.floor(u.exp/100);if(now>old){u.hp+=u.baseHp*.1*(now-old);log(names[u.type]+' 공격력·최대 체력 10% 증가!');beep(760,.12,'triangle');}}
-function makeUnit(type,r,c){let s=specs[type];return {id:Math.random(),type,r,c,baseHp:s.hp,hp:s.hp,exp:0,moved:false,cd:0,skill1:0,skill2:0,skill3:0,healRemainder:0,fireTime:0,fireTick:0,anim:0,attackFlash:0};}
+function makeUnit(type,r,c){let s=specs[type];return {id:Math.random(),type,r,c,purchaseCost:state.pendingPurchaseCost,baseHp:s.hp,hp:s.hp,exp:0,moved:false,cd:0,skill1:0,skill2:0,skill3:0,healRemainder:0,fireTime:0,fireTick:0,anim:0,attackFlash:0};}
 function spawnMob(){let r=Math.floor(Math.random()*ROWS),round=state.round,hp=100,atk=10;
  if(round===2){hp*=1.05;atk*=1.05}else if(round===3){hp*=1.05**2;atk*=1.05**2}else if(round>=4){hp*=1.05**2*1.1**(round-3);atk*=1.05**2*1.1**(round-3);}
  hp*=1.5**Math.floor(round/25)*2**Math.floor(round/50);atk*=1.5**Math.floor(round/25)*2**Math.floor(round/50);
@@ -207,6 +208,7 @@ function draw(){
 function refresh(){ $('mom').textContent=state.mom;$('coin').textContent=state.coin;$('round').textContent=state.round;$('timer').textContent=(5-state.roundClock).toFixed(1);
  $('summon').textContent='캐릭터 소환 ('+state.summonCost+' 코인)';$('summon').disabled=state.coin<state.summonCost||state.over||state.units.length>=15;
  $('upgrade').textContent='경험치 업그레이드 ('+state.upgradeCost+' 코인)';$('upgrade').disabled=state.coin<state.upgradeCost||!state.selected||state.over;
+ $('sell').disabled=!u||state.over;
  $('pause').textContent=state.paused?'계속하기':'일시정지';$('sound').textContent=state.sound?'소리 끄기':'소리 켜기';
  const u=state.units.find(v=>v.id===state.selected);
  $('selected').innerHTML=u?'<b>'+names[u.type]+'</b><br>체력: '+Math.ceil(u.hp)+' / '+Math.ceil(maxHp(u))+'<br>경험치: '+Math.floor(u.exp)+' EXP · 공격력 배율: ×'+mult(u).toFixed(1)+'<br>패시브: '+(u.type==='c'?'사망 시 같은 라인 아군 HP 100 회복 · EXP의 50% 코인 지급':u.type==='m'?'아군 실제 회복량 100당 EXP +5':'없음')+'<br>이동: '+(u.moved?'사용 완료':'1회 가능')+'<br>해금: '+(u.type==='c'&&u.exp>=100?'정복자의 검 · 영혼의 파동 · 영혼 불꽃':u.type==='c'&&u.exp>=50?'정복자의 검 · 영혼의 파동':u.type==='k'&&u.exp>=300?'절멸자 모드':u.type==='k'&&u.exp>=200?'영혼 베기 · 영혼 사슬 · 영혼 늑대':u.type==='k'&&u.exp>=100?'영혼 베기 · 영혼 사슬':u.type==='a'&&u.exp>=300?'화살·독 화살 쿨타임 50% 감소':u.type==='a'&&u.exp>=200?'화살 발사 · 독 화살 · 엘프의 물약':u.type==='a'&&u.exp>=100?'화살 발사 · 독 화살':u.type==='m'&&u.exp>=300?'모든 스킬':u.type==='m'&&u.exp>=200?'냥냥이탄 · 살인병기 발톱 · 캣닢공':u.type==='m'&&u.exp>=100?'냥냥이탄 · 살인병기 발톱':'기본 공격'):'캐릭터를 클릭해 선택하세요. 빈 칸을 클릭하면 선택한 캐릭터를 이동시킬 수 있습니다. 캐릭터당 이동은 1회입니다.';
@@ -214,11 +216,12 @@ function refresh(){ $('mom').textContent=state.mom;$('coin').textContent=state.c
 function frame(t){if(!state.last)state.last=t;let dt=Math.min(.05,(t-state.last)/1000);state.last=t;update(dt);draw();refresh();requestAnimationFrame(frame);}
 function point(ev){let r=canvas.getBoundingClientRect();return{x:(ev.clientX-r.left)*W/r.width,y:(ev.clientY-r.top)*H/r.height};}
 canvas.addEventListener('click',ev=>{if(state.over||state.paused)return;let p=point(ev),c=Math.floor((p.x-BOARD.x)/BOARD.cw),r=Math.floor((p.y-BOARD.y)/BOARD.ch);if(r<0||r>=ROWS||c<0||c>=COLS)return;const rect=slotRect(r,c);if(p.x<rect.x||p.x>rect.x+rect.w||p.y<rect.y||p.y>rect.y+rect.h)return;let u=unitAt(r,c);
- if(state.placing){if(!u){state.units.push(makeUnit(state.pendingType,r,c));state.placing=false;log(names[state.pendingType]+' 배치 완료');state.pendingType=null;beep(600,.1);}return;}
+ if(state.placing){if(!u){state.units.push(makeUnit(state.pendingType,r,c));state.placing=false;log(names[state.pendingType]+' 배치 완료');state.pendingType=null;state.pendingPurchaseCost=10;beep(600,.1);}return;}
  if(u){state.selected=u.id;return;}let sel=state.units.find(v=>v.id===state.selected);if(sel&&!sel.moved){sel.r=r;sel.c=c;sel.moved=true;log(names[sel.type]+' 이동 완료');beep(390,.08);}
 });
-$('summon').onclick=()=>{if(state.coin<state.summonCost||state.over||state.units.length>=15)return;state.coin-=state.summonCost;state.summonCost+=10;let deck=['k','k','a','c','m'],type=deck[Math.floor(Math.random()*deck.length)];state.pendingType=type;state.placing=true;state.selected=null;log(names[type]+' 소환! 빈 슬롯을 선택하세요.');beep(720,.13,'triangle');};
+$('summon').onclick=()=>{if(state.coin<state.summonCost||state.over||state.units.length>=15)return;const paid=state.summonCost;state.coin-=paid;state.summonCost+=10;let deck=['k','k','a','c','m'],type=deck[Math.floor(Math.random()*deck.length)];state.pendingType=type;state.pendingPurchaseCost=paid;state.placing=true;state.selected=null;log(names[type]+' 소환! 빈 슬롯을 선택하세요.');beep(720,.13,'triangle');};
 $('upgrade').onclick=()=>{let u=state.units.find(v=>v.id===state.selected);if(!u||state.coin<state.upgradeCost)return;state.coin-=state.upgradeCost;addExp(u,100);state.upgradeCost+=100;log(names[u.type]+' EXP +100');sfx('upgrade');};
+$('sell').onclick=()=>{const u=state.units.find(v=>v.id===state.selected);if(!u||state.over)return;const refund=Math.floor(u.purchaseCost*.6);state.coin+=refund;state.units=state.units.filter(v=>v!==u);state.selected=null;const p=pos(u.r,u.c);vfx('summon',p.x,p.y,'#e4b45c',.5);label('판매 +'+refund+' 코인',p.x,p.y-25,'#d49a35');log(names[u.type]+' 판매 완료 · '+refund+' 코인 환불 (구매가의 60%)');beep(520,.1,'triangle');};
 $('pause').onclick=()=>{if(state.over)return;state.paused=!state.paused;};
 $('sound').onclick=()=>{state.sound=!state.sound;};
 $('reset').onclick=()=>{state=fresh();$('log').innerHTML='';log('새 게임을 시작합니다.');startRound();};
