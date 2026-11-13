@@ -76,10 +76,10 @@ function unitAt(r,c){return state.units.find(u=>u.r===r&&u.c===c&&u.hp>0);}
 function mult(u){return 1+Math.floor(u.exp/100)*.1;}
 function maxHp(u){return u.baseHp*mult(u);}
 function addExp(u,n){if(!u||u.hp<=0)return;let old=Math.floor(u.exp/100);u.exp+=n;let now=Math.floor(u.exp/100);if(now>old){u.hp+=u.baseHp*.1*(now-old);log(names[u.type]+' 공격력·최대 체력 10% 증가!');beep(760,.12,'triangle');}}
-function awardExp(u,n){if(!u||u.hp<=0||n<=0)return;addExp(u,n);for(const ally of state.units){if(ally!==u&&ally.hp>0)addExp(ally,n*.25);}}
+function awardExp(u,n){if(!u||u.hp<=0||n<=0)return;addExp(u,n);for(const ally of state.units){if(ally!==u&&ally.hp>0)addExp(ally,n*.05);}}
 function makeUnit(type,r,c){let s=specs[type],bonus=state.nextSummonExp||0;state.nextSummonExp=0;let u={id:Math.random(),type,r,c,purchaseCost:state.pendingPurchaseCost,baseHp:s.hp,hp:s.hp,exp:0,moved:false,cd:0,skill1:0,skill2:0,skill3:0,healRemainder:0,fireTime:0,fireTick:0,goldRemainder:0,anim:0,attackFlash:0};if(bonus>0){addExp(u,bonus);u.hp=maxHp(u);log('클라이벳의 영혼 경험치 +'+bonus+' 전달!');}return u;}
 function spawnMob(){let r=Math.floor(Math.random()*ROWS),round=state.round,hp=100,atk=10;
- if(round===2){hp*=1.05;atk*=1.05}else if(round===3){hp*=1.05**2;atk*=1.05**2}else if(round>=4){hp*=1.05**2*1.1**(round-3);atk*=1.05**2*1.1**(round-3);}
+ if(round===2){hp*=1.05;atk*=1.025}else if(round===3){hp*=1.05**2;atk*=1.025**2}else if(round>=4){hp*=1.05**(round-1);atk*=1.025**2*1.05**(round-3);}
  hp*=1.5**Math.floor(round/25)*2**Math.floor(round/50);atk*=1.5**Math.floor(round/25)*2**Math.floor(round/50);
  state.mobs.push({r,x:135,y:BOARD.y+r*BOARD.ch+BOARD.ch/2,hp,maxHp:hp,atk,speed:34+Math.min(round,20),attackCd:0,flash:0});}
 function roundCount(n){return n===1?10:n===2?15:n===3?20:20+n;}
@@ -95,7 +95,7 @@ function useSkills(dt){
   if(u.type==='k'){
    const cd=u.exp>=300?1:2;
    if(u.cd<=0){const targets=state.mobs.filter(m=>m.r===u.r&&m.x<=p.x+10&&m.x>=p.x-BOARD.cw-15).sort((a,b)=>b.x-a.x).slice(0,3);if(targets.length){let totalDamage=0;for(const t of targets){const d=100*dmg;damageMob(t,d,u);totalDamage+=d;vfx('sword',t.x,t.y,'#53baff',.35);label('영혼 베기',t.x,t.y-24,'#348be8');}if(u.exp>=300)heal(u,totalDamage*.5,null);vfx('sword',p.x-55,p.y,'#53baff',.35);sfx('sword');u.anim=.25;}u.cd=cd;}
-   if(u.exp>=100&&u.skill1<=0){const list=state.mobs.filter(m=>Math.abs(m.r-u.r)===1&&m.x<p.x&&m.x>p.x-BOARD.cw-25);if(list.length){const t=list[Math.floor(Math.random()*list.length)];t.x=Math.min(p.x-25,t.x+BOARD.cw*.7);damageMob(t,50*dmg,u);vfx('chain',t.x,t.y,'#69bfff',.55,{toX:p.x,toY:p.y});label('영혼 사슬',t.x,t.y-20,'#4b9dff');sfx('chain');}u.skill1=8;}
+   if(u.exp>=100&&u.skill1<=0){const list=state.mobs.filter(m=>Math.abs(m.r-u.r)===1&&m.x<p.x&&m.x>p.x-BOARD.cw-25);if(list.length){const t=list[Math.floor(Math.random()*list.length)];t.r=u.r;t.y=p.y;t.x=p.x-BOARD.cw;damageMob(t,50*dmg,u);vfx('chain',t.x,t.y,'#69bfff',.55,{toX:p.x,toY:p.y});label('영혼 사슬',t.x,t.y-20,'#4b9dff');sfx('chain');}u.skill1=8;}
    if(u.exp>=200&&u.skill2<=0){state.wolves.push({r:u.r,x:965,y:p.y,owner:u.id,hit:[]});vfx('summon',965,p.y,'#4c9eff',.6);label('영혼 늑대 출격',965,p.y-25,'#367de0');sfx('wolf');u.skill2=15;}
   }else if(u.type==='a'){
    if(u.cd<=0){shoot(u,'화살 발사',3,2,50*dmg,'#9a6337',false,0);u.cd=u.exp>=300?.5:1;}
