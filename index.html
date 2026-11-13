@@ -93,7 +93,7 @@ function useSkills(dt){
   const p=pos(u.r,u.c),dmg=mult(u);
   if(u.type==='k'){
    const cd=u.exp>=300?1:2;
-   if(u.cd<=0){const t=state.mobs.filter(m=>m.r===u.r&&m.x<=p.x+10&&m.x>=p.x-BOARD.cw-15).sort((a,b)=>b.x-a.x)[0];if(t){const d=100*dmg;damageMob(t,d,u);if(u.exp>=300)heal(u,d*.5,null);vfx('sword',p.x-55,p.y,'#53baff',.35);label('영혼 베기',p.x-65,p.y-40,'#348be8');sfx('sword');u.anim=.25;}u.cd=cd;}
+   if(u.cd<=0){const targets=state.mobs.filter(m=>m.r===u.r&&m.x<=p.x+10&&m.x>=p.x-BOARD.cw-15).sort((a,b)=>b.x-a.x).slice(0,3);if(targets.length){let totalDamage=0;for(const t of targets){const d=100*dmg;damageMob(t,d,u);totalDamage+=d;vfx('sword',t.x,t.y,'#53baff',.35);label('영혼 베기',t.x,t.y-24,'#348be8');}if(u.exp>=300)heal(u,totalDamage*.5,null);vfx('sword',p.x-55,p.y,'#53baff',.35);sfx('sword');u.anim=.25;}u.cd=cd;}
    if(u.exp>=100&&u.skill1<=0){const list=state.mobs.filter(m=>Math.abs(m.r-u.r)===1&&m.x<p.x&&m.x>p.x-BOARD.cw-25);if(list.length){const t=list[Math.floor(Math.random()*list.length)];t.x=Math.min(p.x-25,t.x+BOARD.cw*.7);damageMob(t,50*dmg,u);vfx('chain',t.x,t.y,'#69bfff',.55,{toX:p.x,toY:p.y});label('영혼 사슬',t.x,t.y-20,'#4b9dff');sfx('chain');}u.skill1=8;}
    if(u.exp>=200&&u.skill2<=0){state.wolves.push({r:u.r,x:965,y:p.y,owner:u.id,hit:[]});vfx('summon',965,p.y,'#4c9eff',.6);label('영혼 늑대 출격',965,p.y-25,'#367de0');sfx('wolf');u.skill2=15;}
   }else if(u.type==='a'){
