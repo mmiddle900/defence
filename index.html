@@ -40,7 +40,7 @@ button.gold{background:#a76d13}button.red{background:#9e3e4a}button.green{backgr
 <section class="box"><h3>선택한 캐릭터</h3><div id="selected">캐릭터를 클릭해 선택하세요. 빈 칸을 클릭하면 선택한 캐릭터를 이동시킬 수 있습니다. 캐릭터당 이동은 1회입니다.</div></section>
 <section class="box"><h3>전투 기록</h3><div id="log"></div></section>
 </div>
-<p class="note">조작: 소환 후 빈 슬롯을 클릭해 배치 · 캐릭터 클릭 후 빈 슬롯을 클릭해 1회 이동 · 적은 왼쪽에서 오른쪽으로 이동합니다. 캐릭터는 배치된 행에서 왼쪽을 향해 공격합니다. 보스 출현 주기는 별도 지정이 없어 아직 자동 출현시키지 않습니다. 캐릭터와 적은 캔버스에서 직접 그린 전투 스프라이트로 표시됩니다.</p>
+<p class="note">조작: 소환 후 빈 슬롯을 클릭해 배치 · 캐릭터 클릭 후 빈 슬롯을 클릭해 1회 이동 · 적은 왼쪽에서 오른쪽으로 이동합니다. 캐릭터는 배치된 행에서 왼쪽을 향해 공격합니다. 보스의 출현 주기와 능력치는 아직 지정되지 않아 일반 몹만 등장합니다. 덱 5장은 제너럴 K 2장, 아네리아 1장, 클라이벳 1장, 미사 1장입니다.</p>
 </div>
 <script>
 (()=>{
@@ -117,8 +117,6 @@ function update(dt){
   let hit=state.mobs.find(m=>m.r===s.r&&Math.abs(m.x-s.x)<17&&!s.hit.includes(m));if(hit){damageMob(hit,s.damage,state.units.find(u=>u.id===s.owner));s.hit.push(hit);if(!s.pierce)s.life=0;}
  }
  state.shots=state.shots.filter(s=>s.life>0&&s.x>30);
- for(const p of state.potions){p.life-=dt;const ally=state.units.find(u=>u.id===p.target&&u.hp>0);if(ally){const q=pos(ally.r,ally.c);p.tx=q.x;p.ty=q.y-10;}p.x+=(p.tx-p.x)*Math.min(1,dt*7);p.y+=(p.ty-p.y)*Math.min(1,dt*7);if(p.life<=0&&ally){heal(ally,100,state.units.find(u=>u.id===p.owner));vfx('potionBurst',p.x,p.y,'#ff687c',.5);label('엘프의 물약 +100',p.x,p.y-18,'#e45d76');}}
- state.potions=state.potions.filter(p=>p.life>0);
  for(const p of state.potions){p.life-=dt;const t=state.units.find(u=>u.id===p.target&&u.hp>0);if(t){const q=pos(t.r,t.c);p.tx=q.x;p.ty=q.y-10;}p.x+=(p.tx-p.x)*Math.min(1,dt*7);p.y+=(p.ty-p.y)*Math.min(1,dt*7);if(p.life<=0&&t){const healer=state.units.find(u=>u.id===p.owner);heal(t,100,healer);vfx('potionBurst',p.x,p.y,'#ff687c',.5);label('엘프의 물약 +100',p.x,p.y-18,'#e45d76');}else if(p.life<=0&&!t){label('물약 빗나감',p.x,p.y,'#d45d70');}}
  state.potions=state.potions.filter(p=>p.life>0);
  for(const w of state.wolves){w.x-=BOARD.cw*dt;for(const m of [...state.mobs])if(m.r===w.r&&Math.abs(m.x-w.x)<22&&!w.hit.includes(m)){let owner=state.units.find(u=>u.id===w.owner);damageMob(m,50*(owner?mult(owner):1),owner);w.hit.push(m);}}
