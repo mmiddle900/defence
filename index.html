@@ -76,6 +76,7 @@ function unitAt(r,c){return state.units.find(u=>u.r===r&&u.c===c&&u.hp>0);}
 function mult(u){return 1+Math.floor(u.exp/100)*.1;}
 function maxHp(u){return u.baseHp*mult(u);}
 function addExp(u,n){if(!u||u.hp<=0)return;let old=Math.floor(u.exp/100);u.exp+=n;let now=Math.floor(u.exp/100);if(now>old){u.hp+=u.baseHp*.1*(now-old);log(names[u.type]+' 공격력·최대 체력 10% 증가!');beep(760,.12,'triangle');}}
+function awardExp(u,n){if(!u||u.hp<=0||n<=0)return;addExp(u,n);for(const ally of state.units){if(ally!==u&&ally.hp>0)addExp(ally,n*.25);}}
 function makeUnit(type,r,c){let s=specs[type],bonus=state.nextSummonExp||0;state.nextSummonExp=0;let u={id:Math.random(),type,r,c,purchaseCost:state.pendingPurchaseCost,baseHp:s.hp,hp:s.hp,exp:0,moved:false,cd:0,skill1:0,skill2:0,skill3:0,healRemainder:0,fireTime:0,fireTick:0,goldRemainder:0,anim:0,attackFlash:0};if(bonus>0){addExp(u,bonus);u.hp=maxHp(u);log('클라이벳의 영혼 경험치 +'+bonus+' 전달!');}return u;}
 function spawnMob(){let r=Math.floor(Math.random()*ROWS),round=state.round,hp=100,atk=10;
  if(round===2){hp*=1.05;atk*=1.05}else if(round===3){hp*=1.05**2;atk*=1.05**2}else if(round>=4){hp*=1.05**2*1.1**(round-3);atk*=1.05**2*1.1**(round-3);}
@@ -84,8 +85,8 @@ function spawnMob(){let r=Math.floor(Math.random()*ROWS),round=state.round,hp=10
 function roundCount(n){return n===1?10:n===2?15:n===3?20:20+n;}
 function startRound(){state.spawnLeft+=roundCount(state.round);state.spawned=0;log(state.round+'라운드 시작 · 적 '+roundCount(state.round)+'마리 추가');}
 startRound();
-function damageMob(m,d,u){if(!state.mobs.includes(m))return 0;d=damageValue(m,d);const dealt=Math.min(m.hp,d);m.hp-=d;m.flash=.13;state.effects.push({x:m.x,y:m.y,text:'-'+Math.round(d),life:.5,color:'#d43b43'});beep(180,.04,'square');if(m.hp<=0){state.mobs=state.mobs.filter(x=>x!==m);state.coin+=5;if(u)addExp(u,10);log('적 처치! +5 코인');state.effects.push({x:m.x,y:m.y,text:'처치!',life:.7,color:'#d18b24'});}return dealt;}
-function heal(u,amount,source){if(!u||u.hp<=0)return 0;let actual=Math.min(maxHp(u)-u.hp,amount);if(actual<=0)return 0;u.hp+=actual;let p=pos(u.r,u.c);state.effects.push({x:p.x,y:p.y-30,text:'+'+Math.round(actual),life:.7,color:'#1b9b65'});if(source&&source.type==='m'){source.healRemainder+=actual;while(source.healRemainder>=100){source.healRemainder-=100;addExp(source,20);log('미사 패시브: 회복 100당 EXP +20');}}return actual;}
+function damageMob(m,d,u){if(!state.mobs.includes(m))return 0;d=damageValue(m,d);const dealt=Math.min(m.hp,d);m.hp-=d;m.flash=.13;state.effects.push({x:m.x,y:m.y,text:'-'+Math.round(d),life:.5,color:'#d43b43'});beep(180,.04,'square');if(m.hp<=0){state.mobs=state.mobs.filter(x=>x!==m);state.coin+=5;if(u)awardExp(u,10);log('적 처치! +5 코인');state.effects.push({x:m.x,y:m.y,text:'처치!',life:.7,color:'#d18b24'});}return dealt;}
+function heal(u,amount,source){if(!u||u.hp<=0)return 0;let actual=Math.min(maxHp(u)-u.hp,amount);if(actual<=0)return 0;u.hp+=actual;let p=pos(u.r,u.c);state.effects.push({x:p.x,y:p.y-30,text:'+'+Math.round(actual),life:.7,color:'#1b9b65'});if(source&&source.type==='m'){source.healRemainder+=actual;while(source.healRemainder>=100){source.healRemainder-=100;awardExp(source,20);log('미사 패시브: 회복 100당 EXP +20');}}return actual;}
 function shoot(u,kind,range,speed,damage,color,pierce=false,healAlly=0,status=null,statusDuration=0){let p=pos(u.r,u.c);state.shots.push({owner:u.id,r:u.r,x:p.x-25,y:p.y,kind,range,speed,damage,color,pierce,hit:[],healAlly,status,statusDuration,life:range/speed,travel:0});state.effects.push({x:p.x,y:p.y-28,text:kind,life:.55,color});sfx(kind==='화살 발사'?'arrow':kind==='독 화살'?'poison':kind==='냥냥이탄'?'cat':kind==='캣닢공'?'catnip':kind==='마법구'?'magic':'potion');}
 function useSkills(dt){
  for(const u of state.units){
