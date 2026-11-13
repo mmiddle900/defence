@@ -109,7 +109,6 @@ function useSkills(dt){
    if(u.exp>=100&&u.skill1<=0){const targets=state.mobs.filter(m=>m.r===u.r&&Math.abs(m.x-(p.x-BOARD.cw*3))<=BOARD.cw*.52);for(const enemy of targets){damageMob(enemy,25*dmg,u);applyStatus(enemy,'weak',3);vfx('claw',enemy.x,enemy.y,'#fff',.4);}if(targets.length){label('살인병기 발톱',p.x-BOARD.cw*3,p.y-22,'#fff');sfx('claw');}u.skill1=8;}
    if(u.exp>=200&&u.skill2<=0){shoot(u,'캣닢공',5,1,0,'#4ad36d',false,50);u.skill2=15;}
    if(u.exp>=300&&u.skill3<=0){state.dashes.push({owner:u.id,life:.75,max:.75});for(const m of [...state.mobs])if(m.r===u.r)applyStatus(m,'vulnerable',5);vfx('jet',p.x,p.y,'#ff9b52',.8);label('냐아아아아아오오오옹! · 취약',p.x-80,p.y-55,'#e777c4');sfx('jet');u.skill3=20;}
-  }
   }else if(u.type==='f'){
    if(u.cd<=0){shoot(u,'마법구',5,2,150*dmg,'#a45bea',true,0);u.cd=5;u.anim=.3;sfx('magic');}
    if(u.exp>=100&&u.skill1<=0){const target=state.mobs.filter(m=>m.r===u.r&&m.x<p.x).sort((a,b)=>b.x-a.x)[0];if(target){damageMob(target,200*dmg,u);vfx('franLaser',p.x-20,p.y,'#9c4be8',.42,{toX:target.x});label('레이저',target.x,target.y-28,'#a04ee5');sfx('laser');}u.skill1=10;}
