@@ -89,7 +89,7 @@ function useSkills(dt){
   if(u.type==='k'){
    const cd=u.exp>=300?1:2;
    if(u.cd<=0){const t=state.mobs.filter(m=>m.r===u.r&&m.x<=p.x+10&&m.x>=p.x-BOARD.cw-15).sort((a,b)=>b.x-a.x)[0];if(t){const d=100*dmg;damageMob(t,d,u);if(u.exp>=300)heal(u,d*.5,null);vfx('sword',p.x-55,p.y,'#53baff',.35);label('영혼 베기',p.x-65,p.y-40,'#348be8');sfx('sword');u.anim=.25;}u.cd=cd;}
-   if(u.exp>=100&&u.skill1<=0){const list=state.mobs.filter(m=>Math.abs(m.r-u.r)===1&&m.x<p.x&&m.x>p.x-BOARD.cw*3);if(list.length){const t=list[Math.floor(Math.random()*list.length)];t.x=Math.min(p.x-25,t.x+BOARD.cw*.7);damageMob(t,50*dmg,u);vfx('chain',t.x,t.y,'#69bfff',.55,{toX:p.x,toY:p.y});label('영혼 사슬',t.x,t.y-20,'#4b9dff');sfx('chain');}u.skill1=8;}
+   if(u.exp>=100&&u.skill1<=0){const list=state.mobs.filter(m=>Math.abs(m.r-u.r)===1&&m.x<p.x&&m.x>p.x-BOARD.cw-25);if(list.length){const t=list[Math.floor(Math.random()*list.length)];t.x=Math.min(p.x-25,t.x+BOARD.cw*.7);damageMob(t,50*dmg,u);vfx('chain',t.x,t.y,'#69bfff',.55,{toX:p.x,toY:p.y});label('영혼 사슬',t.x,t.y-20,'#4b9dff');sfx('chain');}u.skill1=8;}
    if(u.exp>=200&&u.skill2<=0){state.wolves.push({r:u.r,x:965,y:p.y,owner:u.id,hit:[]});vfx('summon',965,p.y,'#4c9eff',.6);label('영혼 늑대 출격',965,p.y-25,'#367de0');sfx('wolf');u.skill2=15;}
   }else if(u.type==='a'){
    if(u.cd<=0){shoot(u,'화살 발사',3,2,50*dmg,'#f7fbff',false,0);u.cd=u.exp>=300?1.5:3;}
@@ -98,7 +98,7 @@ function useSkills(dt){
   }else if(u.type==='c'){
    if(u.cd<=0){const t=state.mobs.filter(m=>m.r===u.r&&m.x<=p.x+10&&m.x>=p.x-BOARD.cw-15).sort((a,b)=>b.x-a.x)[0];if(t){const d=100*dmg;damageMob(t,d,u);heal(u,d*.25,null);vfx('cliveSlash',p.x-40,p.y,'#c49aff',.42);label('정복자의 검',p.x-55,p.y-42,'#a875e8');sfx('clive');u.anim=.25;if(u.exp>=50){for(const m of [...state.mobs]){const dx=Math.abs(m.x-p.x),dr=Math.abs(m.r-u.r);if(dr<=1&&dx<BOARD.cw*1.08&&(dx>12||dr>0))damageMob(m,d*.15,u);}vfx('soulWave',p.x-25,p.y,'#c59aff',.5);label('영혼을 담은 힘',p.x-30,p.y+42,'#b18be9');}}u.cd=2;}
    if(u.exp>=100&&u.skill1<=0){u.fireTime=3;u.fireTick=0;u.skill1=10;vfx('fireStart',p.x-170,p.y,'#ff944d',.8);label('영혼 불꽃',p.x-100,p.y-48,'#ff9a57');sfx('flame');}
-   if(u.fireTime>0){u.fireTime=Math.max(0,u.fireTime-dt);u.fireTick-=dt;if(u.fireTick<=0){for(const m of [...state.mobs])if(m.r===u.r)damageMob(m,10*dmg,u);u.fireTick=1;vfx('fireBurst',p.x-110,p.y,'#ff853d',.32);}}
+   if(u.fireTime>0){u.fireTime=Math.max(0,u.fireTime-dt);u.fireTick-=dt;if(u.fireTick<=0){for(const m of [...state.mobs])if(m.r===u.r)damageMob(m,10*dmg,u);u.fireTick=1;vfx('fireLine',BOARD.x+5,p.y,'#ff853d',.42,{row:u.r});}}
   }else if(u.type==='m'){
    if(u.cd<=0){shoot(u,'냥냥이탄',2,2,15*dmg,'#f47acb',true,5);u.cd=2;}
    if(u.exp>=100&&u.skill1<=0){const t=state.mobs.find(m=>m.r===u.r&&Math.abs(m.x-(p.x-BOARD.cw*3))<BOARD.cw*.52);if(t){damageMob(t,100*dmg,u);vfx('claw',t.x,t.y,'#fff',.4);label('살인병기 발톱',t.x,t.y-22,'#fff');sfx('claw');}u.skill1=8;}
@@ -127,12 +127,12 @@ function update(dt){
   else m.x+=m.speed*dt;
   if(m.x>=1030){state.mobs=state.mobs.filter(x=>x!==m);state.mom--;log('적이 엄마에게 도달! 엄마 HP -1');beep(90,.25,'square');if(state.mom<=0){state.mom=0;state.over=true;log('게임 오버! 다시 시작을 눌러 재도전하세요.');}}
  }
- for(const e of state.effects)e.life-=dt;state.effects=state.effects.filter(e=>e.life>0);for(const e of state.vfx)e.life-=dt;state.vfx=state.vfx.filter(e=>e.life>0);for(const d of state.dashes)d.life-=dt;state.dashes=state.dashes.filter(d=>d.life>0);for(const e of state.vfx)e.life-=dt;state.vfx=state.vfx.filter(e=>e.life>0);for(const d of state.dashes)d.life-=dt;state.dashes=state.dashes.filter(d=>d.life>0);
+ for(const e of state.effects)e.life-=dt;state.effects=state.effects.filter(e=>e.life>0);for(const e of state.vfx)e.life-=dt;state.vfx=state.vfx.filter(e=>e.life>0);for(const e of state.vfx)e.life-=dt;state.vfx=state.vfx.filter(e=>e.life>0);for(const d of state.dashes)d.life-=dt;state.dashes=state.dashes.filter(d=>d.life>0);
 }
 function rr(x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
 function drawCharacter(u,p){
  const color=specs[u.type].color, x=p.x, y=p.y-13;
- ctx.save();ctx.translate(x,y);
+ ctx.save();ctx.translate(x,y);if(u.anim>0)ctx.rotate(-.07);
  ctx.fillStyle='rgba(25,42,65,.16)';ctx.beginPath();ctx.ellipse(0,25,23,6,0,0,Math.PI*2);ctx.fill();
  ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(-15,-2,30,31,9);ctx.fill();
  ctx.fillStyle='#f2c9a7';ctx.beginPath();ctx.arc(0,-15,13,0,Math.PI*2);ctx.fill();
@@ -154,6 +154,8 @@ function drawCharacter(u,p){
   ctx.fillStyle='#5a3152';ctx.beginPath();ctx.arc(-5,-14,2,0,Math.PI*2);ctx.arc(5,-14,2,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,-8,3,0,Math.PI*2);ctx.fill();
  }
+ if(u.type==='m'&&u.anim>0){ctx.fillStyle='#596777';ctx.fillRect(-18,0,8,19);ctx.fillRect(10,0,8,19);ctx.fillStyle='#ff9c4c';ctx.beginPath();ctx.moveTo(-14,19);ctx.lineTo(-20,33);ctx.lineTo(-8,25);ctx.fill();ctx.beginPath();ctx.moveTo(14,19);ctx.lineTo(20,33);ctx.lineTo(8,25);ctx.fill();}
+ if(u.anim>0){ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(-16,1,24,-.7,.65);ctx.stroke();}
  ctx.restore();
 }
 function drawMonster(m){
@@ -192,6 +194,7 @@ function draw(){
   if(e.type==='sword'||e.type==='cliveSlash'||e.type==='claw'){ctx.beginPath();ctx.arc(e.x,e.y,18+age*55,Math.PI*.15,Math.PI*1.05);ctx.stroke();ctx.beginPath();ctx.moveTo(e.x-45,e.y+15);ctx.lineTo(e.x+18,e.y-35);ctx.stroke();}
   else if(e.type==='chain'){ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.quadraticCurveTo((e.x+e.toX)/2,e.y-35,e.toX,e.toY);ctx.stroke();ctx.beginPath();ctx.arc(e.x,e.y,7+age*8,0,Math.PI*2);ctx.stroke();}
   else if(e.type==='soulWave'){ctx.beginPath();ctx.arc(e.x,e.y,20+age*75,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(e.x,e.y,12+age*45,0,Math.PI*2);ctx.stroke();}
+  else if(e.type==='fireLine'){const grad=ctx.createLinearGradient(BOARD.x,e.y,965,e.y);grad.addColorStop(0,'rgba(255,92,35,0)');grad.addColorStop(.15,'rgba(255,125,42,.75)');grad.addColorStop(.5,'rgba(255,190,65,.95)');grad.addColorStop(.85,'rgba(255,110,35,.75)');grad.addColorStop(1,'rgba(255,92,35,0)');ctx.fillStyle=grad;ctx.fillRect(BOARD.x,e.y-22,965-BOARD.x,44);for(let i=0;i<14;i++){const xx=BOARD.x+i*58+(age*35%58);ctx.beginPath();ctx.moveTo(xx,e.y+15);ctx.quadraticCurveTo(xx-9,e.y-8-age*16,xx+6,e.y-25-age*18);ctx.quadraticCurveTo(xx+20,e.y-3,xx+10,e.y+15);ctx.fill();}}
   else if(e.type==='fireStart'||e.type==='fireBurst'){for(let i=0;i<5;i++){const xx=e.x+i*38;ctx.beginPath();ctx.moveTo(xx,e.y+15);ctx.quadraticCurveTo(xx-10,e.y-10-age*18,xx+8,e.y-25-age*20);ctx.quadraticCurveTo(xx+23,e.y-3,xx+12,e.y+15);ctx.fill();}}
   else if(e.type==='summon'||e.type==='jet'||e.type==='potionBurst'||e.type==='potionCast'){ctx.beginPath();ctx.arc(e.x,e.y,12+age*45,0,Math.PI*2);ctx.stroke();for(let i=0;i<8;i++){const an=i*Math.PI/4;ctx.beginPath();ctx.moveTo(e.x+Math.cos(an)*18,e.y+Math.sin(an)*18);ctx.lineTo(e.x+Math.cos(an)*(28+age*30),e.y+Math.sin(an)*(28+age*30));ctx.stroke();}}
   ctx.restore();
