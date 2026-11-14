@@ -80,7 +80,7 @@ function awardExp(u,n){if(!u||u.hp<=0||n<=0)return;addExp(u,n);for(const ally of
 function makeUnit(type,r,c){let s=specs[type],bonus=state.nextSummonExp||0;state.nextSummonExp=0;let u={id:Math.random(),type,r,c,purchaseCost:state.pendingPurchaseCost,baseHp:s.hp,hp:s.hp,exp:0,moved:false,cd:0,skill1:0,skill2:0,skill3:0,healRemainder:0,fireTime:0,fireTick:0,goldRemainder:0,anim:0,attackFlash:0};if(bonus>0){addExp(u,bonus);u.hp=maxHp(u);log('클라이벳의 영혼 경험치 +'+bonus+' 전달!');}return u;}
 function spawnMob(){let r=Math.floor(Math.random()*ROWS),round=state.round,hp=100,atk=10;
  if(round===2){hp*=1.05;atk*=1.025}else if(round===3){hp*=1.05**2;atk*=1.025**2}else if(round>=4){hp*=1.05**(round-1);atk*=1.025**2*1.05**(round-3);}
- hp*=1.5**Math.floor(round/25)*2**Math.floor(round/50);atk*=1.5**Math.floor(round/25)*2**Math.floor(round/50);
+ hp*=1.5**Math.floor(round/25);atk*=1.5**Math.floor(round/25);
  state.mobs.push({r,x:135,y:BOARD.y+r*BOARD.ch+BOARD.ch/2,hp,maxHp:hp,atk,speed:34+Math.min(round,20),attackCd:0,flash:0});}
 function roundCount(n){return n===1?10:n===2?15:n===3?20:20+n;}
 function startRound(){state.spawnLeft+=roundCount(state.round);state.spawned=0;log(state.round+'라운드 시작 · 적 '+roundCount(state.round)+'마리 추가');}
@@ -94,7 +94,7 @@ function useSkills(dt){
   const p=pos(u.r,u.c),dmg=mult(u);
   if(u.type==='k'){
    const cd=u.exp>=300?1:2;
-   if(u.cd<=0){const targets=state.mobs.filter(m=>m.r===u.r&&m.x<=p.x+10&&m.x>=p.x-BOARD.cw-15).sort((a,b)=>b.x-a.x).slice(0,3);if(targets.length){let totalDamage=0;for(const t of targets){const d=100*dmg;damageMob(t,d,u);totalDamage+=d;vfx('sword',t.x,t.y,'#53baff',.35);label('영혼 베기',t.x,t.y-24,'#348be8');}if(u.exp>=300)heal(u,totalDamage*.5,null);vfx('sword',p.x-55,p.y,'#53baff',.35);sfx('sword');u.anim=.25;}u.cd=cd;}
+   if(u.cd<=0){const targets=state.mobs.filter(m=>m.r===u.r&&m.x<=p.x+10&&m.x>=p.x-BOARD.cw-15).sort((a,b)=>b.x-a.x).slice(0,3);if(targets.length){let totalDamage=0;for(const t of targets){const d=100*dmg;totalDamage+=damageMob(t,d,u);vfx('sword',t.x,t.y,'#53baff',.35);label('영혼 베기',t.x,t.y-24,'#348be8');}if(u.exp>=300)heal(u,totalDamage*.5,null);vfx('sword',p.x-55,p.y,'#53baff',.35);sfx('sword');u.anim=.25;}u.cd=cd;}
    if(u.exp>=100&&u.skill1<=0){const list=state.mobs.filter(m=>Math.abs(m.r-u.r)===1&&m.x<p.x&&m.x>p.x-BOARD.cw-25);if(list.length){const t=list[Math.floor(Math.random()*list.length)];t.r=u.r;t.y=p.y;t.x=p.x-BOARD.cw;damageMob(t,50*dmg,u);vfx('chain',t.x,t.y,'#69bfff',.55,{toX:p.x,toY:p.y});label('영혼 사슬',t.x,t.y-20,'#4b9dff');sfx('chain');}u.skill1=8;}
    if(u.exp>=200&&u.skill2<=0){state.wolves.push({r:u.r,x:965,y:p.y,owner:u.id,hit:[]});vfx('summon',965,p.y,'#4c9eff',.6);label('영혼 늑대 출격',965,p.y-25,'#367de0');sfx('wolf');u.skill2=15;}
   }else if(u.type==='a'){
@@ -104,7 +104,7 @@ function useSkills(dt){
   }else if(u.type==='c'){
    if(u.cd<=0){const t=state.mobs.filter(m=>m.r===u.r&&m.x<=p.x+10&&m.x>=p.x-BOARD.cw-15).sort((a,b)=>b.x-a.x)[0];if(t){const d=100*dmg;const dealt=damageMob(t,d,u);heal(u,dealt*.25,null);u.goldRemainder=(u.goldRemainder||0)+dealt*.05;const gold=Math.floor(u.goldRemainder);if(gold>0){state.coin+=gold;u.goldRemainder-=gold;label('+'+gold+' 코인',p.x-35,p.y-55,'#c58b25');}vfx('cliveSlash',p.x-40,p.y,'#c49aff',.42);label('정복자의 검',p.x-55,p.y-42,'#a875e8');sfx('clive');u.anim=.25;if(u.exp>=50){for(const m of [...state.mobs]){const dx=Math.abs(m.x-p.x),dr=Math.abs(m.r-u.r);if(dr<=1&&dx<BOARD.cw*1.08&&(dx>12||dr>0)){const splashDealt=damageMob(m,d*.15,u);u.goldRemainder=(u.goldRemainder||0)+splashDealt*.05;const splashGold=Math.floor(u.goldRemainder);if(splashGold>0){state.coin+=splashGold;u.goldRemainder-=splashGold;label('+'+splashGold+' 코인',m.x,m.y-40,'#c58b25');}}}vfx('soulWave',p.x-25,p.y,'#c59aff',.5);label('영혼을 담은 힘',p.x-30,p.y+42,'#b18be9');}}u.cd=2;}
    if(u.exp>=100&&u.skill1<=0){u.fireTime=3;u.fireTick=0;u.skill1=10;vfx('fireStart',p.x-170,p.y,'#ff944d',.8);label('영혼 불꽃',p.x-100,p.y-48,'#ff9a57');sfx('flame');}
-   if(u.fireTime>0){u.fireTime=Math.max(0,u.fireTime-dt);u.fireTick-=dt;if(u.fireTick<=0){for(const m of [...state.mobs])if(m.r===u.r)damageMob(m,10*dmg,u);u.fireTick=1;vfx('fireLine',BOARD.x+5,p.y,'#ff853d',.42,{row:u.r});}}
+   if(u.fireTime>0){u.fireTime=Math.max(0,u.fireTime-dt);u.fireTick-=dt;if(u.fireTick<=0){for(const m of [...state.mobs])if(m.r===u.r)damageMob(m,100*dmg,u);u.fireTick=1;vfx('fireLine',BOARD.x+5,p.y,'#ff853d',.42,{row:u.r});}}
   }else if(u.type==='m'){
    if(u.cd<=0){shoot(u,'냥냥이탄',2,2,15*dmg,'#f47acb',true,20,'slow',3);u.cd=2;}
    if(u.exp>=100&&u.skill1<=0){const targets=state.mobs.filter(m=>m.r===u.r&&Math.abs(m.x-(p.x-BOARD.cw*3))<=BOARD.cw*.52);for(const enemy of targets){damageMob(enemy,25*dmg,u);applyStatus(enemy,'weak',3);vfx('claw',enemy.x,enemy.y,'#fff',.4);}if(targets.length){label('살인병기 발톱',p.x-BOARD.cw*3,p.y-22,'#fff');sfx('claw');}u.skill1=8;}
